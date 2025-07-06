@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, ScrollView, Alert, Platform } from 'react-native';
+import { StyleSheet, View, ScrollView, Alert, Platform, PermissionsAndroid } from 'react-native';
 import { Button, Text, useTheme, SegmentedButtons, Chip, List, ActivityIndicator } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import DocumentPicker, { DocumentPickerResponse, types } from '@react-native-documents/picker';
+import { pick as DocumentPicker, types, DocumentPickerResponse, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useApp } from '../context/AppContext';
@@ -22,10 +22,40 @@ const AddDocumentScreen = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   
+  // Request Android permissions
+  const requestAndroidPermissions = async (): Promise<boolean> => {
+    if (Platform.OS !== 'android') {
+      return true;
+    }
+    
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission',
+          message: 'This app needs access to storage to pick documents.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        }
+      );
+      
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.warn('Permission request error:', err);
+      return false;
+    }
+  };
+  
   // Handle document picker
   const handlePickDocument = async () => {
+    console.log('DocumentPicker: handlePickDocument called');
+    console.log('DocumentPicker function:', DocumentPicker);
+    console.log('Types object:', types);
+    
     try {
-      const result = await DocumentPicker.pick({
+      console.log('DocumentPicker: About to call DocumentPicker()');
+      const result = await DocumentPicker({
         type: [
           types.pdf,
           types.doc,
@@ -37,14 +67,23 @@ const AddDocumentScreen = () => {
           types.images,
           types.plainText,
         ],
-        copyTo: 'cachesDirectory',
+        allowMultiSelection: false,
+        mode: 'import',
       });
       
-      setSelectedFile(result[0]);
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        // User cancelled the picker
+      console.log('DocumentPicker: Pick result:', result);
+      
+      if (result && result.length > 0) {
+        setSelectedFile(result[0]);
       } else {
+        console.log('DocumentPicker: No file selected');
+      }
+    } catch (err: any) {
+      // Check if user cancelled using the proper error checking
+      if (isErrorWithCode(err, errorCodes.canceled)) {
+        console.log('DocumentPicker: User cancelled the picker');
+      } else {
+        console.log('DocumentPicker: Error caught:', err);
         console.error('Error picking document:', err);
         Alert.alert('Error', 'Failed to pick document. Please try again.');
       }
@@ -111,14 +150,14 @@ const AddDocumentScreen = () => {
         await RNFS.mkdir(documentsDir);
       }
       
-      // Generate a unique filename to avoid conflicts
-      const fileName = selectedFile.name ? `${Date.now()}_${selectedFile.name}` : `${Date.now()}_document`;
-      const fileExt = selectedFile.name ? selectedFile.name.split('.').pop() || '' : '';
-      const destPath = `${documentsDir}/${fileName}`;
-      
-      // Copy the file from cache to app's documents directory
-      if (selectedFile.fileCopyUri) {
-        await RNFS.copyFile(selectedFile.fileCopyUri, destPath);
+        // Generate a unique filename to avoid conflicts
+        const fileName = selectedFile.name ? `${Date.now()}_${selectedFile.name}` : `${Date.now()}_document`;
+        const fileExt = selectedFile.name ? selectedFile.name.split('.').pop() || '' : '';
+        const destPath = `${documentsDir}/${fileName}`;
+        
+        // Copy the file from cache to app's documents directory
+        if (selectedFile.uri) {
+          await RNFS.copyFile(selectedFile.uri, destPath);
         
         // Add document to state
         // Keep original MIME type for proper file opening
@@ -151,7 +190,7 @@ const AddDocumentScreen = () => {
           uri: destPath,
           type: displayFileType,
           mimeType: originalMimeType, // Store original MIME type
-          size: selectedFile.size !== null ? selectedFile.size : 0,
+          size: selectedFile.size || 0,
           category: selectedCategory,
           tags: selectedTags,
           isFavorite: false,
@@ -181,17 +220,17 @@ const AddDocumentScreen = () => {
           {selectedFile ? (
             <View style={[styles.selectedFileContainer, { backgroundColor: theme.colors.surfaceVariant, borderColor: theme.colors.outline + '20' }]}>
               <Icon
-                name={getFileIcon(selectedFile.type !== null ? selectedFile.type : undefined)}
+                name={getFileIcon(selectedFile.type)}
                 size={40}
                 color={theme.colors.primary}
                 style={styles.fileIcon}
               />
               <View style={styles.fileInfo}>
                 <Text variant="titleSmall" numberOfLines={1} style={{ color: theme.colors.onSurface }}>
-                  {selectedFile.name !== null ? selectedFile.name : 'Unnamed Document'}
+                  {selectedFile.name || 'Unnamed Document'}
                 </Text>
                 <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-                  {formatFileSize(selectedFile.size !== null ? selectedFile.size : undefined)} • {selectedFile.type !== null ? selectedFile.type : 'Unknown'}
+                  {formatFileSize(selectedFile.size)} • {selectedFile.type || 'Unknown'}
                 </Text>
               </View>
               <Button
