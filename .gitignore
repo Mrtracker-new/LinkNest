@@ -55,6 +55,16 @@ yarn-error.log
 
 # Bundle artifact
 *.jsbundle
+*.bundle
+index.android.bundle
+index.ios.bundle
+
+# Expo
+.expo/
+expo-env.d.ts
+
+# Bundle config
+.bundle/
 
 # Ruby / CocoaPods
 **/Pods/
