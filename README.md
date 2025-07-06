@@ -21,7 +21,7 @@ LinkNest is a comprehensive React Native application designed to help you manage
 
 - 🔗 **Link Management**: Save and organize web links with custom titles and descriptions
 - 📝 **Note Taking**: Create and manage rich text notes with full editing capabilities
-- 📁 **File Storage**: Upload and organize various file types with preview support
+- 📁 **Document Storage**: Upload and organize various document types with preview support
 - 🏷️ **Smart Categorization**: Organize resources using customizable categories and tags
 - ⭐ **Favorites System**: Mark important resources for quick access
 - 🔍 **Powerful Search**: Full-text search across all your resources
@@ -48,7 +48,7 @@ LinkNest is a comprehensive React Native application designed to help you manage
 Before you begin, ensure you have the following installed:
 
 - **Node.js** (>= 18.0.0)
-- **React Native CLI**
+- **React Native CLI** (19.0.0)
 - **Android Studio** (for Android development)
 - **Xcode** (for iOS development - macOS only)
 - **Git**
@@ -59,7 +59,7 @@ Before you begin, ensure you have the following installed:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/LinkNest.git
+git clone https://github.com/Mrtracker-new/LinkNest.git
 cd LinkNest
 ```
 
@@ -94,7 +94,7 @@ npm run ios
 
 ### Getting Started
 1. **Home Screen**: Overview of your recent and favorite resources
-2. **Add Resources**: Tap the floating action button (+) to add links, notes, or files
+2. **Add Resources**: Tap the floating action button (+) to add links, notes, or documents
 3. **Categories**: Organize resources into custom categories
 4. **Tags**: Apply multiple tags for granular organization
 5. **Search**: Use the search bar to find specific resources
@@ -116,21 +116,21 @@ npm run ios
 4. Organize with categories and tags
 5. Save your note
 
-#### Uploading Files
+#### Uploading Documents
 1. Tap the "+" button
-2. Select "Add File"
-3. Choose file from device
+2. Select "Add Document"
+3. Choose document from device
 4. Add metadata and organize
-5. Save your file
+5. Save your document
 
 ## 📂 Project Structure
 
 ```
-MyReactNativeApp/
+LinkNest/
 ├── src/
 │   ├── components/          # Reusable UI components
+│   │   ├── DocumentCard.tsx
 │   │   ├── EmptyState.tsx
-│   │   ├── FileCard.tsx
 │   │   ├── FilterBar.tsx
 │   │   ├── LinkCard.tsx
 │   │   └── NoteCard.tsx
@@ -140,20 +140,24 @@ MyReactNativeApp/
 │   ├── navigation/          # Navigation configuration
 │   │   └── index.tsx
 │   ├── screens/             # App screens
-│   │   ├── AddFileScreen.tsx
+│   │   ├── AddDocumentScreen.tsx
 │   │   ├── AddLinkScreen.tsx
 │   │   ├── AddNoteScreen.tsx
 │   │   ├── CategoriesScreen.tsx
+│   │   ├── DocumentsScreen.tsx
 │   │   ├── HomeScreen.tsx
-│   │   └── ...
+│   │   ├── LinksScreen.tsx
+│   │   ├── NotesScreen.tsx
+│   │   ├── SettingsScreen.tsx
+│   │   └── TagsScreen.tsx
 │   ├── theme/               # Theme configuration
 │   │   └── index.ts
 │   ├── types/               # TypeScript type definitions
 │   │   └── index.ts
 │   └── utils/               # Utility functions
-│       ├── FileOpener.ts
 │       ├── UrlOpener.ts
-│       └── fileUtils.ts
+│       ├── urlUtils.ts
+│       └── urlUtils.d.ts
 ├── android/                 # Android-specific code
 ├── ios/                     # iOS-specific code
 ├── App.tsx                  # Main app component
@@ -245,7 +249,7 @@ npm run ios
 
 ### Getting Help
 - Check [React Native Troubleshooting](https://reactnative.dev/docs/troubleshooting)
-- Review [GitHub Issues](https://github.com/your-username/MyReactNativeApp/issues)
+- Review [GitHub Issues](https://github.com/Mrtracker-new/LinkNest/issues)
 - Contact the development team
 
 ## 📄 License
