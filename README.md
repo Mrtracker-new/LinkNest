@@ -1,10 +1,12 @@
 # 📚 LinkNest - Your Ultimate Resource Organizer
 
 <div align="center">
+  <img src="https://img.shields.io/badge/Version-1.0.0-brightgreen.svg" alt="Version" />
   <img src="https://img.shields.io/badge/React%20Native-0.80.1-blue.svg" alt="React Native Version" />
   <img src="https://img.shields.io/badge/TypeScript-5.0.4-blue.svg" alt="TypeScript Version" />
   <img src="https://img.shields.io/badge/Platform-iOS%20%7C%20Android-lightgrey.svg" alt="Platform" />
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License" />
+  <img src="https://img.shields.io/badge/Year-2025-orange.svg" alt="Year" />
 </div>
 
 <div align="center">

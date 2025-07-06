@@ -3,7 +3,7 @@
  * Integrates React Navigation, Paper UI, and Custom Context
  *
  * @author Rolan Lobo
- * @version 0.0.1
+ * @version 1.0.0
  * @format
  */
 
