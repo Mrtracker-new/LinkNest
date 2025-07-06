@@ -1,7 +1,8 @@
 {
-  "name": "MyReactNativeApp",
+  "name": "LinkNest",
   "version": "0.0.1",
   "private": true,
+  "author": "Rolan Lobo",
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -10,9 +11,28 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-documents/picker": "^10.1.5",
+    "@react-native/new-app-screen": "0.80.1",
+    "@react-navigation/bottom-tabs": "^7.4.2",
+    "@react-navigation/native": "^7.1.14",
+    "@react-navigation/native-stack": "^7.3.21",
+    "expo": "^53.0.17",
     "react": "19.1.0",
     "react-native": "0.80.1",
-    "@react-native/new-app-screen": "0.80.1"
+    "react-native-blob-util": "^0.22.2",
+    "react-native-file-viewer": "^2.1.5",
+    "react-native-fs": "^2.20.0",
+    "react-native-gesture-handler": "^2.27.1",
+    "react-native-image-viewing": "^0.2.2",
+    "react-native-paper": "^5.14.5",
+    "react-native-pdf": "^6.7.7",
+    "react-native-reanimated": "^3.18.0",
+    "react-native-safe-area-context": "^5.5.1",
+    "react-native-screens": "^4.11.1",
+    "react-native-share": "^12.1.0",
+    "react-native-uuid": "^2.0.3",
+    "react-native-vector-icons": "^10.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
