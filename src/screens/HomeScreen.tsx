@@ -22,23 +22,52 @@ const HomeScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const styles = createStyles(theme);
 
-  // Get recent items
-  const recentLinks = [...links]
+  // Filter items based on search query
+  const filteredLinks = links.filter((link) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      link.title.toLowerCase().includes(query) ||
+      link.url.toLowerCase().includes(query) ||
+      (link.description && link.description.toLowerCase().includes(query))
+    );
+  });
+
+  const filteredNotes = notes.filter((note) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      note.title.toLowerCase().includes(query) ||
+      note.content.toLowerCase().includes(query)
+    );
+  });
+
+  const filteredDocuments = documents.filter((doc) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      doc.name.toLowerCase().includes(query) ||
+      doc.type.toLowerCase().includes(query)
+    );
+  });
+
+  // Get recent items from filtered results
+  const recentLinks = [...filteredLinks]
     .sort((a, b) => b.updatedAt - a.updatedAt)
     .slice(0, 3);
 
-  const recentNotes = [...notes]
+  const recentNotes = [...filteredNotes]
     .sort((a, b) => b.updatedAt - a.updatedAt)
     .slice(0, 3);
     
-  const recentDocuments = [...documents]
+  const recentDocuments = [...filteredDocuments]
     .sort((a, b) => b.updatedAt - a.updatedAt)
     .slice(0, 3);
 
-  // Get favorite items
-  const favoriteLinks = links.filter((link) => link.isFavorite).slice(0, 3);
-  const favoriteNotes = notes.filter((note) => note.isFavorite).slice(0, 3);
-  const favoriteDocuments = documents.filter((doc) => doc.isFavorite).slice(0, 3);
+  // Get favorite items from filtered results
+  const favoriteLinks = filteredLinks.filter((link) => link.isFavorite).slice(0, 3);
+  const favoriteNotes = filteredNotes.filter((note) => note.isFavorite).slice(0, 3);
+  const favoriteDocuments = filteredDocuments.filter((doc) => doc.isFavorite).slice(0, 3);
 
   // Handle search
   const handleSearch = (query: string) => {
@@ -113,6 +142,38 @@ const HomeScreen = () => {
           style={[styles.fab, { backgroundColor: theme.colors.primary }]}
           onPress={() => navigation.navigate('AddLink')}
           color={theme.colors.onPrimary}
+        />
+      </View>
+    );
+  }
+
+  // Show no search results message when searching
+  const hasSearchResults = recentLinks.length > 0 || recentNotes.length > 0 || recentDocuments.length > 0 || favoriteLinks.length > 0 || favoriteNotes.length > 0 || favoriteDocuments.length > 0;
+  
+  if (!isLoading && searchQuery && !hasSearchResults) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.titleContainer}>
+            <Icon name="link-variant" size={28} color={theme.colors.primary} style={styles.titleIcon} />
+            <Text variant="headlineMedium" style={styles.title}>
+              LinkNest
+            </Text>
+          </View>
+          <Searchbar
+            placeholder="Search"
+            onChangeText={handleSearch}
+            value={searchQuery}
+            style={styles.searchBar}
+            iconColor={theme.colors.primary}
+          />
+        </View>
+        <EmptyState
+          icon="magnify"
+          title="No Results Found"
+          message={`No items found matching "${searchQuery}". Try adjusting your search query.`}
+          actionLabel="Clear Search"
+          onAction={() => setSearchQuery('')}
         />
       </View>
     );
