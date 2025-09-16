@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, ScrollView, Alert, Platform, PermissionsAndroid } from 'react-native';
-import { Button, Text, useTheme, SegmentedButtons, Chip, List, ActivityIndicator } from 'react-native-paper';
+import { Button, Text, useTheme, Chip } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { pick as DocumentPicker, types, DocumentPickerResponse, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
+import { pick, types, DocumentPickerResponse, isErrorWithCode, errorCodes } from '@react-native-documents/picker';
 import RNFS from 'react-native-fs';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useApp } from '../context/AppContext';
@@ -50,12 +50,20 @@ const AddDocumentScreen = () => {
   // Handle document picker
   const handlePickDocument = async () => {
     console.log('DocumentPicker: handlePickDocument called');
-    console.log('DocumentPicker function:', DocumentPicker);
+    
+    // Request permissions on Android
+    const hasPermission = await requestAndroidPermissions();
+    if (!hasPermission) {
+      Alert.alert('Permission Required', 'Storage permission is required to pick documents.');
+      return;
+    }
+    
+      console.log('DocumentPicker pick function:', pick);
     console.log('Types object:', types);
     
     try {
-      console.log('DocumentPicker: About to call DocumentPicker()');
-      const result = await DocumentPicker({
+      console.log('DocumentPicker: About to call pick()');
+      const result = await pick({
         type: [
           types.pdf,
           types.doc,
@@ -80,8 +88,10 @@ const AddDocumentScreen = () => {
       }
     } catch (err: any) {
       // Check if user cancelled using the proper error checking
-      if (isErrorWithCode(err, errorCodes.canceled)) {
+      if (isErrorWithCode(err) && err.code === errorCodes.OPERATION_CANCELED) {
         console.log('DocumentPicker: User cancelled the picker');
+      } else if (isErrorWithCode(err) && err.code === errorCodes.IN_PROGRESS) {
+        console.log('DocumentPicker: Multiple pickers were opened, only the last will be considered');
       } else {
         console.log('DocumentPicker: Error caught:', err);
         console.error('Error picking document:', err);
@@ -103,7 +113,7 @@ const AddDocumentScreen = () => {
   };
   
   // Get file icon based on type
-  const getFileIcon = (type: string | undefined) => {
+  const getFileIcon = (type: string | null | undefined) => {
     if (!type) return 'file-box';
     
     const fileType = type.toLowerCase();
@@ -117,7 +127,7 @@ const AddDocumentScreen = () => {
   };
   
   // Format file size
-  const formatFileSize = (bytes: number | undefined) => {
+  const formatFileSize = (bytes: number | null | undefined) => {
     if (!bytes) return '0 B';
     
     if (bytes < 1024) return bytes + ' B';
@@ -220,7 +230,7 @@ const AddDocumentScreen = () => {
           {selectedFile ? (
             <View style={[styles.selectedFileContainer, { backgroundColor: theme.colors.surfaceVariant, borderColor: theme.colors.outline + '20' }]}>
               <Icon
-                name={getFileIcon(selectedFile.type)}
+                name={getFileIcon(selectedFile.type ?? undefined)}
                 size={40}
                 color={theme.colors.primary}
                 style={styles.fileIcon}
@@ -230,7 +240,7 @@ const AddDocumentScreen = () => {
                   {selectedFile.name || 'Unnamed Document'}
                 </Text>
                 <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-                  {formatFileSize(selectedFile.size)} • {selectedFile.type || 'Unknown'}
+                  {formatFileSize(selectedFile.size ?? undefined)} • {selectedFile.type || 'Unknown'}
                 </Text>
               </View>
               <Button

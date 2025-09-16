@@ -7,7 +7,7 @@ import EmptyState from '../components/EmptyState';
 
 const CategoriesScreen = () => {
   const theme = useTheme();
-  const { categories, addCategory, updateCategory, deleteCategory, links, notes, files } = useApp();
+  const { categories, addCategory, updateCategory, deleteCategory, links, notes, documents } = useApp();
   
   // Dialog state
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -81,9 +81,9 @@ const CategoriesScreen = () => {
     // Check if category is in use
     const linksUsingCategory = links.filter(link => link.category === category.id).length;
     const notesUsingCategory = notes.filter(note => note.category === category.id).length;
-    const filesUsingCategory = files.filter(file => file.category === category.id).length;
+    const documentsUsingCategory = documents.filter(document => document.category === category.id).length;
     
-    const totalUsage = linksUsingCategory + notesUsingCategory + filesUsingCategory;
+    const totalUsage = linksUsingCategory + notesUsingCategory + documentsUsingCategory;
     
     if (totalUsage > 0) {
       // Category is in use, show warning
@@ -121,21 +121,21 @@ const CategoriesScreen = () => {
     // Count items using this category
     const linksCount = links.filter(link => link.category === item.id).length;
     const notesCount = notes.filter(note => note.category === item.id).length;
-    const filesCount = files.filter(file => file.category === item.id).length;
+    const documentsCount = documents.filter(document => document.category === item.id).length;
     
-    const totalCount = linksCount + notesCount + filesCount;
+    const totalCount = linksCount + notesCount + documentsCount;
     const description = totalCount > 0 
-      ? `${totalCount} item${totalCount !== 1 ? 's' : ''} (${linksCount} link${linksCount !== 1 ? 's' : ''}, ${notesCount} note${notesCount !== 1 ? 's' : ''}, ${filesCount} file${filesCount !== 1 ? 's' : ''})`
+      ? `${totalCount} item${totalCount !== 1 ? 's' : ''} (${linksCount} link${linksCount !== 1 ? 's' : ''}, ${notesCount} note${notesCount !== 1 ? 's' : ''}, ${documentsCount} document${documentsCount !== 1 ? 's' : ''})`
       : 'No items';
     
     return (
       <List.Item
         title={item.name}
         description={description}
-        left={props => (
+        left={(_props) => (
           <View style={[styles.categoryColor, { backgroundColor: item.color || theme.colors.primary }]} />
         )}
-        right={props => (
+        right={(_props) => (
           <View style={styles.actionsContainer}>
             <IconButton
               icon="pencil"

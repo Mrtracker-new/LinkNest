@@ -7,7 +7,7 @@ import EmptyState from '../components/EmptyState';
 
 const TagsScreen = () => {
   const theme = useTheme();
-  const { tags, addTag, updateTag, deleteTag, links, notes, files } = useApp();
+  const { tags, addTag, updateTag, deleteTag, links, notes, documents } = useApp();
   
   // Dialog state
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -77,9 +77,9 @@ const TagsScreen = () => {
     // Check if tag is in use
     const linksUsingTag = links.filter(link => link.tags.includes(tag.id)).length;
     const notesUsingTag = notes.filter(note => note.tags.includes(tag.id)).length;
-    const filesUsingTag = files.filter(file => file.tags.includes(tag.id)).length;
+    const documentsUsingTag = documents.filter(document => document.tags.includes(tag.id)).length;
     
-    const totalUsage = linksUsingTag + notesUsingTag + filesUsingTag;
+    const totalUsage = linksUsingTag + notesUsingTag + documentsUsingTag;
     
     if (totalUsage > 0) {
       // Tag is in use, show warning
@@ -117,19 +117,19 @@ const TagsScreen = () => {
     // Count items using this tag
     const linksCount = links.filter(link => link.tags.includes(item.id)).length;
     const notesCount = notes.filter(note => note.tags.includes(item.id)).length;
-    const filesCount = files.filter(file => file.tags.includes(item.id)).length;
+    const documentsCount = documents.filter(document => document.tags.includes(item.id)).length;
     
-    const totalCount = linksCount + notesCount + filesCount;
+    const totalCount = linksCount + notesCount + documentsCount;
     const description = totalCount > 0 
-      ? `${totalCount} item${totalCount !== 1 ? 's' : ''} (${linksCount} link${linksCount !== 1 ? 's' : ''}, ${notesCount} note${notesCount !== 1 ? 's' : ''}, ${filesCount} file${filesCount !== 1 ? 's' : ''})`
+      ? `${totalCount} item${totalCount !== 1 ? 's' : ''} (${linksCount} link${linksCount !== 1 ? 's' : ''}, ${notesCount} note${notesCount !== 1 ? 's' : ''}, ${documentsCount} document${documentsCount !== 1 ? 's' : ''})`
       : 'No items';
     
     return (
       <List.Item
         title={item.name}
         description={description}
-        left={props => <List.Icon {...props} icon="tag" />}
-        right={props => (
+        left={(props) => <List.Icon {...props} icon="tag" />}
+        right={(_props) => (
           <View style={styles.actionsContainer}>
             <IconButton
               icon="pencil"
