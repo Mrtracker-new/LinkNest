@@ -7,7 +7,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RootStackParamList } from '../navigation';
 import { useApp } from '../context/AppContext';
-import { extractDomain, ensureUrlProtocol } from '../utils/urlUtils.ts';
+import { extractDomain, ensureUrlProtocol } from '../utils/urlUtils';
+import { useHaptic } from '../hooks/useHaptic';
+import { useToast } from '../components/Toast';
 
 // Helper function to clean and process YouTube URLs
 const processYoutubeUrl = (url: string, description?: string): string => {
@@ -68,6 +70,8 @@ const LinkDetailsScreen = () => {
   const navigation = useNavigation<LinkDetailsScreenNavigationProp>();
   const route = useRoute<LinkDetailsScreenRouteProp>();
   const { links, categories, tags, deleteLink, toggleFavoriteLink } = useApp();
+  const haptic = useHaptic();
+  const toast = useToast();
   const [menuVisible, setMenuVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(false);
@@ -244,6 +248,7 @@ const LinkDetailsScreen = () => {
 
   // Handle delete link
   const handleDeleteLink = () => {
+    haptic.warning();
     Alert.alert(
       'Delete Link',
       'Are you sure you want to delete this link? This action cannot be undone.',
@@ -253,7 +258,14 @@ const LinkDetailsScreen = () => {
           text: 'Delete',
           style: 'destructive',
           onPress: async () => {
+            haptic.heavy();
             await deleteLink(id);
+            haptic.success();
+            toast.showToast({
+              message: 'Link deleted successfully',
+              type: 'success',
+              duration: 2000,
+            });
             navigation.goBack();
           },
         },
@@ -264,6 +276,7 @@ const LinkDetailsScreen = () => {
   // Handle toggle favorite
   const handleToggleFavorite = async () => {
     if (!link) return;
+    haptic.light();
     await toggleFavoriteLink(id);
   };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, ScrollView, RefreshControl } from 'react-native';
-import { Text, FAB, useTheme, Searchbar, Card, Divider, Button } from 'react-native-paper';
+import { Text, useTheme, Searchbar, Card, Divider, Button, FAB } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -10,6 +10,8 @@ import LinkCard from '../components/LinkCard';
 import NoteCard from '../components/NoteCard';
 import DocumentCard from '../components/DocumentCard';
 import EmptyState from '../components/EmptyState';
+import { SkeletonCard } from '../components/SkeletonLoader';
+import AnimatedFAB from '../components/AnimatedFAB';
 import { Link, Note, Document, Resource } from '../types';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -126,6 +128,41 @@ const HomeScreen = () => {
     </View>
   );
 
+  // Show loading skeleton
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.titleContainer}>
+            <Icon name="link-variant" size={28} color={theme.colors.primary} style={styles.titleIcon} />
+            <Text variant="headlineMedium" style={styles.title}>
+              LinkNest
+            </Text>
+          </View>
+          <Searchbar
+            placeholder="Search"
+            onChangeText={handleSearch}
+            value={searchQuery}
+            style={styles.searchBar}
+            iconColor={theme.colors.primary}
+          />
+        </View>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text variant="titleLarge" style={styles.sectionTitle}>
+                Recent Items
+              </Text>
+            </View>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <SkeletonCard key={index} style={{ marginBottom: 12 }} />
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
+  
   // Show empty state if no data
   if (!isLoading && links.length === 0 && notes.length === 0 && documents.length === 0) {
     return (
@@ -381,9 +418,8 @@ const HomeScreen = () => {
         </View>
       </ScrollView>
 
-      <FAB
+      <AnimatedFAB
         icon="plus"
-        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
         onPress={() => navigation.navigate('AddLink')}
         color={theme.colors.onPrimary}
       />
@@ -397,19 +433,18 @@ const createStyles = (theme: any) => StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   header: {
-    padding: 20,
-    paddingTop: 32,
+    padding: 24,
+    paddingTop: 36,
+    paddingBottom: 24,
     backgroundColor: theme.colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.outline + '20',
-    elevation: 2,
-    shadowColor: '#000',
+    elevation: 4,
+    shadowColor: theme.colors.shadow,
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
   },
   titleContainer: {
     flexDirection: 'row',
@@ -421,16 +456,14 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   title: {
     fontWeight: '800',
-    fontSize: 24,
-    letterSpacing: -0.5,
+    fontSize: 28,
+    letterSpacing: -0.6,
   },
   searchBar: {
     elevation: 0,
-    borderRadius: 12,
-    height: 52,
+    borderRadius: 16,
+    height: 54,
     backgroundColor: theme.colors.surfaceVariant,
-    borderWidth: 1,
-    borderColor: theme.colors.outline + '20',
   },
   scrollContent: {
     paddingBottom: 100,
@@ -456,8 +489,8 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   sectionTitle: {
     fontWeight: '700',
-    fontSize: 18,
-    letterSpacing: -0.3,
+    fontSize: 20,
+    letterSpacing: -0.4,
   },
   viewAll: {
     fontWeight: '600',
@@ -472,32 +505,30 @@ const createStyles = (theme: any) => StyleSheet.create({
     paddingVertical: 8,
   },
   categoryCard: {
-    width: 150,
+    width: 160,
     marginRight: 16,
-    borderLeftWidth: 4,
-    borderRadius: 16,
-    elevation: 3,
-    shadowColor: '#000',
+    borderLeftWidth: 5,
+    borderRadius: 20,
+    elevation: 4,
+    shadowColor: theme.colors.shadow,
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
     backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.outline + '20',
   },
   categoryCardContent: {
-    padding: 16,
+    padding: 18,
   },
   categoryIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   categoryName: {
     fontWeight: '600',
@@ -516,14 +547,14 @@ const createStyles = (theme: any) => StyleSheet.create({
     right: 0,
     bottom: 0,
     borderRadius: 28,
-    elevation: 6,
-    shadowColor: '#000',
+    elevation: 8,
+    shadowColor: theme.colors.primary,
     shadowOffset: {
       width: 0,
-      height: 3,
+      height: 6,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
   },
   seeAllButton: {
     fontSize: 14,

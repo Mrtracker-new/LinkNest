@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Card, Text, IconButton, useTheme, Chip } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import OptimizedIcon from './OptimizedIcon';
 import { Document } from '../types';
 import { useApp } from '../context/AppContext';
 
@@ -61,7 +61,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress }) => {
         <View style={styles.header}>
           {category && (
             <View style={styles.categoryContainer}>
-              <Icon 
+              <OptimizedIcon
                 name={category.icon} 
                 size={16} 
                 color={category.color} 
@@ -86,7 +86,7 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress }) => {
         
         <View style={styles.documentInfo}>
           <View style={[styles.iconContainer, { backgroundColor: theme.colors.surfaceVariant, borderColor: theme.colors.outline + '30' }]}>
-            <Icon 
+            <OptimizedIcon
               name={getFileIcon(document.type)} 
               size={24} 
               color={theme.colors.primary} 
@@ -124,10 +124,10 @@ const DocumentCard: React.FC<DocumentCardProps> = ({ document, onPress }) => {
               <Chip 
                 style={styles.moreTag}
                 textStyle={{ color: theme.colors.onSurfaceVariant }}
-                compact
-              >
-                +{documentTags.length - 2}
-              </Chip>
+                  compact
+                >
+                  {`+${documentTags.length - 2}`}
+                </Chip>
             )}
           </View>
         )}

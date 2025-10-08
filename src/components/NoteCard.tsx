@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Card, Text, IconButton, useTheme, Chip } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import OptimizedIcon from './OptimizedIcon';
 import { Note } from '../types';
 import { useApp } from '../context/AppContext';
 
@@ -41,7 +41,7 @@ const NoteCard: React.FC<NoteCardProps> = ({ note, onPress }) => {
         <View style={styles.header}>
           {category && (
             <View style={styles.categoryContainer}>
-              <Icon 
+              <OptimizedIcon
                 name={category.icon} 
                 size={16} 
                 color={category.color} 
@@ -95,7 +95,7 @@ const NoteCard: React.FC<NoteCardProps> = ({ note, onPress }) => {
                   textStyle={{ color: theme.colors.onSurfaceVariant }}
                   compact
                 >
-                  +{noteTags.length - 2}
+                  {`+${noteTags.length - 2}`}
                 </Chip>
               )}
             </View>
@@ -109,31 +109,31 @@ const NoteCard: React.FC<NoteCardProps> = ({ note, onPress }) => {
 const createStyles = (theme: any) => StyleSheet.create({
   card: {
     marginBottom: 16,
-    marginHorizontal: 4,
-    borderRadius: 16,
-    elevation: 3,
-    shadowColor: '#000',
+    marginHorizontal: 16,
+    borderRadius: 20,
+    elevation: 4,
+    shadowColor: theme.colors.shadow,
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
     backgroundColor: theme.colors.surface,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   categoryContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: theme.colors.surfaceVariant,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
   },
   categoryIcon: {
     marginRight: 6,
@@ -150,12 +150,14 @@ const createStyles = (theme: any) => StyleSheet.create({
     fontWeight: '700',
     marginBottom: 12,
     lineHeight: 24,
-    fontSize: 16,
+    fontSize: 17,
+    letterSpacing: -0.3,
   },
   content: {
     marginBottom: 16,
-    lineHeight: 20,
-    opacity: 0.8,
+    lineHeight: 22,
+    opacity: 0.75,
+    color: theme.colors.onSurfaceVariant,
   },
   footer: {
     flexDirection: 'row',
@@ -174,15 +176,16 @@ const createStyles = (theme: any) => StyleSheet.create({
     alignItems: 'center',
   },
   tag: {
-    marginLeft: 6,
-    height: 26,
-    borderRadius: 13,
+    marginLeft: 8,
+    height: 28,
+    borderRadius: 14,
+    elevation: 1,
   },
   moreTag: {
-    marginLeft: 6,
-    height: 26,
+    marginLeft: 8,
+    height: 28,
     backgroundColor: theme.colors.surfaceVariant,
-    borderRadius: 13,
+    borderRadius: 14,
   },
 });
 

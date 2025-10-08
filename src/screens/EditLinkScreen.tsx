@@ -196,24 +196,21 @@ const EditLinkScreen = () => {
           visible={categoryMenuVisible}
           onDismiss={() => setCategoryMenuVisible(false)}
           anchor={
-            <Chip
+            <Button
               mode="outlined"
-              onPress={() => setCategoryMenuVisible(true)}
+              onPress={() => setCategoryMenuVisible(!categoryMenuVisible)}
               style={styles.categoryChip}
-              avatar={
-                selectedCategory ? (
-                  <Icon name={selectedCategory.icon} size={20} color={selectedCategory.color} />
-                ) : undefined
-              }
+              contentStyle={styles.categoryButtonContent}
+              icon={selectedCategory ? selectedCategory.icon : 'folder'}
             >
               {selectedCategory ? selectedCategory.name : 'Select Category'}
-            </Chip>
+            </Button>
           }
         >
           {categories.map((cat) => (
             <Menu.Item
               key={cat.id}
-              leadingIcon={({ size, color }) => (
+              leadingIcon={({ size }) => (
                 <Icon name={cat.icon} size={size} color={cat.color} />
               )}
               onPress={() => handleCategorySelect(cat.id)}
@@ -322,7 +319,11 @@ const styles = StyleSheet.create({
   },
   categoryChip: {
     marginBottom: 16,
-    height: 40,
+    height: 44,
+  },
+  categoryButtonContent: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
   },
   tagsContainer: {
     flexDirection: 'row',

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, FlatList, TouchableOpacity } from 'react-native';
-import { FAB, Searchbar, Chip, Text, useTheme, Divider } from 'react-native-paper';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { StyleSheet, View, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
+import { Searchbar, Chip, Text, useTheme, Divider } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -9,23 +9,23 @@ import { RootStackParamList } from '../navigation';
 import { Document } from '../types';
 import EmptyState from '../components/EmptyState';
 import FilterBar from '../components/FilterBar';
+import { SkeletonDocumentCard } from '../components/SkeletonLoader';
+import AnimatedFAB from '../components/AnimatedFAB';
 
 type DocumentsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const DocumentsScreen = ({ route }: any) => {
   const theme = useTheme();
   const navigation = useNavigation<DocumentsScreenNavigationProp>();
-  const { documents, categories, tags } = useApp();
-  
-  // Get category ID from route params if available
-  const categoryId = route.params?.categoryId;
+  const { documents, categories, isLoading } = useApp();
   
   // State
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(categoryId || null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'alphabetical' | 'favorites'>('newest');
   const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   
   // Filter documents based on search, category, tags, and sort
   useEffect(() => {
@@ -77,23 +77,30 @@ const DocumentsScreen = ({ route }: any) => {
   }, [documents, searchQuery, selectedCategory, selectedTags, sortBy]);
   
   // Handle search
-  const handleSearch = (query: string) => {
+  const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
-  };
+  }, []);
   
+  // Handle refresh
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
   
   // Handle add document
-  const handleAddDocument = () => {
+  const handleAddDocument = useCallback(() => {
     navigation.navigate('AddDocument');
-  };
+  }, [navigation]);
   
   // Handle document press
-  const handleDocumentPress = (id: string) => {
+  const handleDocumentPress = useCallback((id: string) => {
     navigation.navigate('DocumentDetails', { id });
-  };
+  }, [navigation]);
   
-  // Get file icon based on type
-  const getFileIcon = (type: string) => {
+  // Get file icon based on type - memoized
+  const getFileIcon = useMemo(() => (type: string) => {
     const fileType = type.toLowerCase();
     if (fileType.includes('pdf')) return 'file-pdf-box';
     if (fileType.includes('doc') || fileType.includes('word')) return 'file-word-box';
@@ -102,17 +109,17 @@ const DocumentsScreen = ({ route }: any) => {
     if (fileType.includes('txt') || fileType.includes('text')) return 'file-document-box';
     if (fileType.includes('jpg') || fileType.includes('jpeg') || fileType.includes('png') || fileType.includes('image')) return 'file-image-box';
     return 'file-box';
-  };
+  }, []);
   
-  // Format file size
-  const formatFileSize = (bytes: number) => {
+  // Format file size - memoized
+  const formatFileSize = useMemo(() => (bytes: number) => {
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-  };
+  }, []);
   
-  // Render document item
-  const renderDocumentItem = ({ item }: { item: Document }) => {
+  // Render document item with useCallback
+  const renderDocumentItem = useCallback(({ item }: { item: Document }) => {
     const category = categories.find((cat) => cat.id === item.category);
     
     return (
@@ -157,7 +164,7 @@ const DocumentsScreen = ({ route }: any) => {
         </View>
       </TouchableOpacity>
     );
-  };
+  }, [categories, theme, getFileIcon, formatFileSize, handleDocumentPress]);
   
   return (
     <View style={styles.container}>
@@ -178,7 +185,13 @@ const DocumentsScreen = ({ route }: any) => {
         setSortBy={setSortBy}
       />
       
-      {filteredDocuments.length === 0 ? (
+      {isLoading ? (
+        <View style={styles.listContent}>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <SkeletonDocumentCard key={index} />
+          ))}
+        </View>
+      ) : filteredDocuments.length === 0 ? (
         <EmptyState
           icon="file-document-outline"
           title="No documents yet"
@@ -191,12 +204,24 @@ const DocumentsScreen = ({ route }: any) => {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           ItemSeparatorComponent={() => <Divider style={styles.divider} />}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
+            />
+          }
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          updateCellsBatchingPeriod={50}
+          initialNumToRender={10}
+          windowSize={10}
         />
       )}
       
-      <FAB
+      <AnimatedFAB
         icon="plus"
-        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
         onPress={handleAddDocument}
         color={theme.colors.onPrimary}
       />

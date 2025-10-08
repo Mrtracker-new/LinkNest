@@ -1,66 +1,74 @@
 import { MD3DarkTheme, MD3LightTheme } from 'react-native-paper';
 import { DefaultTheme as NavigationLightTheme, DarkTheme as NavigationDarkTheme } from '@react-navigation/native';
 
-// Custom colors
+// Modern custom colors with better contrast and vibrancy
 const customColors = {
-  primary: '#6200EE',
-  primaryContainer: '#E8DEF8',
-  secondary: '#03DAC6',
-  secondaryContainer: '#CEFAF5',
-  tertiary: '#FF6B9D',
-  tertiaryContainer: '#FFE8EE',
+  primary: '#7C3AED',        // Vibrant purple
+  primaryContainer: '#F3E8FF', // Light purple container
+  secondary: '#10B981',       // Modern emerald green
+  secondaryContainer: '#D1FAE5', // Light green container
+  tertiary: '#F59E0B',        // Warm amber
+  tertiaryContainer: '#FEF3C7', // Light amber container
   surface: '#FFFFFF',
-  surfaceVariant: '#F7F7F7',
-  background: '#FAFAFA',
-  error: '#D32F2F',
-  errorContainer: '#FFEBEE',
+  surfaceVariant: '#F9FAFB',  // Slightly gray
+  background: '#F8FAFC',      // Soft background
+  error: '#EF4444',
+  errorContainer: '#FEE2E2',
   onPrimary: '#FFFFFF',
-  onPrimaryContainer: '#21005E',
-  onSecondary: '#000000',
-  onSecondaryContainer: '#00413D',
+  onPrimaryContainer: '#4C1D95',
+  onSecondary: '#FFFFFF',
+  onSecondaryContainer: '#064E3B',
   onTertiary: '#FFFFFF',
-  onTertiaryContainer: '#31111D',
-  onSurface: '#1A1A1A',
-  onSurfaceVariant: '#5A5A5A',
-  onBackground: '#1A1A1A',
+  onTertiaryContainer: '#78350F',
+  onSurface: '#1F2937',
+  onSurfaceVariant: '#6B7280',
+  onBackground: '#1F2937',
   onError: '#FFFFFF',
-  onErrorContainer: '#410E0B',
-  outline: '#8E8E93',
+  onErrorContainer: '#7F1D1D',
+  outline: '#9CA3AF',
   shadow: '#000000',
-  inverseSurface: '#313033',
-  inverseOnSurface: '#F4EFF4',
-  inversePrimary: '#D0BCFF',
+  inverseSurface: '#1F2937',
+  inverseOnSurface: '#F9FAFB',
+  inversePrimary: '#A78BFA',
+  // Additional gradient colors
+  gradientStart: '#7C3AED',
+  gradientEnd: '#A78BFA',
+  cardShadow: 'rgba(124, 58, 237, 0.1)',
 };
 
-// Custom dark colors
+// Modern custom dark colors with OLED-friendly blacks
 const customDarkColors = {
-  primary: '#D0BCFF',
-  primaryContainer: '#4F378B',
-  secondary: '#A4F0E8',
-  secondaryContainer: '#004D47',
-  tertiary: '#FFB3C1',
-  tertiaryContainer: '#5D2A37',
-  surface: '#1F1F1F',
-  surfaceVariant: '#2B2B2B',
-  background: '#141414',
-  error: '#FF8A95',
-  errorContainer: '#8C1D18',
-  onPrimary: '#381E72',
-  onPrimaryContainer: '#EADDFF',
-  onSecondary: '#003A37',
-  onSecondaryContainer: '#A4F0E8',
-  onTertiary: '#492532',
-  onTertiaryContainer: '#FFB3C1',
-  onSurface: '#E8E8E8',
-  onSurfaceVariant: '#C5C5C5',
-  onBackground: '#E8E8E8',
+  primary: '#A78BFA',         // Lighter purple for dark mode
+  primaryContainer: '#5B21B6', // Deep purple container
+  secondary: '#34D399',       // Bright emerald for dark
+  secondaryContainer: '#065F46', // Dark green container
+  tertiary: '#FBBF24',        // Bright amber
+  tertiaryContainer: '#92400E', // Dark amber container
+  surface: '#1E293B',         // Slate surface
+  surfaceVariant: '#334155',  // Lighter slate
+  background: '#0F172A',      // Deep slate background
+  error: '#F87171',
+  errorContainer: '#991B1B',
+  onPrimary: '#4C1D95',
+  onPrimaryContainer: '#DDD6FE',
+  onSecondary: '#064E3B',
+  onSecondaryContainer: '#A7F3D0',
+  onTertiary: '#78350F',
+  onTertiaryContainer: '#FDE68A',
+  onSurface: '#F1F5F9',
+  onSurfaceVariant: '#CBD5E1',
+  onBackground: '#F1F5F9',
   onError: '#FFFFFF',
-  onErrorContainer: '#FFB4AB',
-  outline: '#8F8F8F',
+  onErrorContainer: '#FCA5A5',
+  outline: '#64748B',
   shadow: '#000000',
-  inverseSurface: '#E6E1E5',
-  inverseOnSurface: '#313033',
-  inversePrimary: '#6200EE',
+  inverseSurface: '#F1F5F9',
+  inverseOnSurface: '#1E293B',
+  inversePrimary: '#7C3AED',
+  // Additional gradient colors
+  gradientStart: '#7C3AED',
+  gradientEnd: '#A78BFA',
+  cardShadow: 'rgba(167, 139, 250, 0.15)',
 };
 
 // Create navigation-compatible font structure

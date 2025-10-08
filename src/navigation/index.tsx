@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationContainer, NavigatorScreenParams } from '@react-navigation/native';
+import { NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTheme } from 'react-native-paper';
@@ -75,17 +75,30 @@ const MainTabNavigator = () => {
           return <Icon name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.outline,
+        tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
         tabBarStyle: {
           backgroundColor: theme.colors.surface,
-          borderTopColor: theme.colors.surfaceVariant,
-          elevation: 8,
-          height: 60,
-          paddingBottom: 8,
+          borderTopWidth: 0,
+          elevation: 12,
+          shadowColor: theme.colors.shadow,
+          shadowOffset: {
+            width: 0,
+            height: -4,
+          },
+          shadowOpacity: 0.08,
+          shadowRadius: 12,
+          height: 68,
+          paddingBottom: 10,
+          paddingTop: 10,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
+          fontSize: 11,
+          fontWeight: '600',
+          marginTop: 4,
+          letterSpacing: 0.3,
+        },
+        tabBarIconStyle: {
+          marginTop: 4,
         },
         headerShown: false,
       })}

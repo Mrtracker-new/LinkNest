@@ -12,8 +12,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useApp } from '../context/AppContext';
 import { RootStackParamList } from '../navigation';
 import { Document } from '../types';
-// Import the required dependency for react-native-pdf
-import ReactNativeBlobUtil from 'react-native-blob-util';
 
 type DocumentDetailsRouteProp = RouteProp<RootStackParamList, 'DocumentDetails'>;
 type DocumentDetailsNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -109,7 +107,7 @@ const styles = createStyles(theme);
       console.log('Share result:', result);
     } catch (error) {
       console.error('Error sharing document:', error);
-      if (error.message !== 'User did not share') {
+      if (error instanceof Error && error.message !== 'User did not share') {
         Alert.alert('Error', 'Failed to share document. Please try again.');
       }
     } finally {
@@ -266,7 +264,7 @@ try {
       let message = '';
       let buttons = [];
       
-      if (error.message && error.message.includes('No app associated')) {
+      if (error instanceof Error && error.message && error.message.includes('No app associated')) {
         if (isImageFile) {
           title = 'No Image Viewer Available';
           message = 'Your device does not have an app installed that can view images.';
@@ -284,7 +282,7 @@ try {
               text: 'Share File',
               onPress: () => handleShareDocument()
             },
-            { text: 'OK', style: 'cancel' }
+            { text: 'OK', style: 'cancel' as const }
           ];
         } else if (isPDF) {
           title = 'No PDF Viewer Available';
@@ -303,7 +301,7 @@ try {
               text: 'Share File',
               onPress: () => handleShareDocument()
             },
-            { text: 'OK', style: 'cancel' }
+            { text: 'OK', style: 'cancel' as const }
           ];
         } else if (isVideo) {
           title = 'No Video Player Available';
@@ -322,7 +320,7 @@ try {
               text: 'Share File',
               onPress: () => handleShareDocument()
             },
-            { text: 'OK', style: 'cancel' }
+            { text: 'OK', style: 'cancel' as const }
           ];
         } else if (isAudio) {
           title = 'No Audio Player Available';
@@ -341,7 +339,7 @@ try {
               text: 'Share File',
               onPress: () => handleShareDocument()
             },
-            { text: 'OK', style: 'cancel' }
+            { text: 'OK', style: 'cancel' as const }
           ];
         } else if (isDocument) {
           title = 'No Office App Available';
@@ -360,7 +358,7 @@ try {
               text: 'Share File',
               onPress: () => handleShareDocument()
             },
-            { text: 'OK', style: 'cancel' }
+            { text: 'OK', style: 'cancel' as const }
           ];
         } else {
           title = 'No Compatible App';
@@ -379,12 +377,12 @@ try {
               text: 'Share File',
               onPress: () => handleShareDocument()
             },
-            { text: 'OK', style: 'cancel' }
+            { text: 'OK', style: 'cancel' as const }
           ];
         }
-      } else if (error.message && error.message.includes('File does not exist')) {
+      } else if (error instanceof Error && error.message && error.message.includes('File does not exist')) {
         message = 'The file no longer exists. It may have been moved or deleted.';
-        buttons = [{ text: 'OK', style: 'default' }];
+        buttons = [{ text: 'OK', style: 'default' as const }];
       } else {
         message = 'Unable to open the file. This could be due to:\n\n• File corruption\n• Missing compatible app\n• Insufficient permissions\n\nTry sharing the file to access it through other apps.';
         buttons = [
@@ -392,7 +390,7 @@ try {
             text: 'Share File',
             onPress: () => handleShareDocument()
           },
-          { text: 'OK', style: 'cancel' }
+          { text: 'OK', style: 'cancel' as const }
         ];
       }
       
@@ -422,10 +420,10 @@ try {
       'Delete Document',
       'Are you sure you want to delete this document? This action cannot be undone.',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Cancel', style: 'cancel' as const },
         {
           text: 'Delete',
-          style: 'destructive',
+          style: 'destructive' as const,
           onPress: async () => {
             try {
               setIsLoading(true);

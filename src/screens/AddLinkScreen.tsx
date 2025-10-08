@@ -1,10 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { TextInput, Button, useTheme, HelperText, Chip, Text, IconButton, Menu } from 'react-native-paper';
+import { TextInput, useTheme, HelperText, Chip, Text, IconButton, Menu, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
 import { useApp } from '../context/AppContext';
+import { useHaptic } from '../hooks/useHaptic';
+import { useToast } from '../components/Toast';
+import AnimatedButton from '../components/AnimatedButton';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Helper function to process YouTube URLs
@@ -27,7 +30,7 @@ const processYoutubeUrl = (url: string, description?: string): { url: string, de
     let videoId = null;
     
     // Pattern 1: /videoID or /videoID?parameters
-    const pathMatch = cleanDescription.match(/[\/]([a-zA-Z0-9_-]{11})(\?|$)/);
+    const pathMatch = cleanDescription.match(/[/]([a-zA-Z0-9_-]{11})(\?|$)/);
     if (pathMatch && pathMatch[1]) {
       videoId = pathMatch[1];
     }
@@ -53,7 +56,7 @@ const processYoutubeUrl = (url: string, description?: string): { url: string, de
       cleanUrl = `https://youtu.be/${videoId}`;
       // Remove the video ID from the description to avoid duplication
       cleanDescription = cleanDescription
-        .replace(/[\/]([a-zA-Z0-9_-]{11})(\?|$)/, '')
+        .replace(/[/]([a-zA-Z0-9_-]{11})(\?|$)/, '')
         .replace(/[?&]v=([a-zA-Z0-9_-]{11})(&|$)/, '')
         .replace(/^\s*([a-zA-Z0-9_-]{11})\s*$/, '')
         .trim();
@@ -74,6 +77,8 @@ const AddLinkScreen = () => {
   const theme = useTheme();
   const navigation = useNavigation<AddLinkScreenNavigationProp>();
   const { addLink, categories, tags } = useApp();
+  const haptic = useHaptic();
+  const toast = useToast();
 
   // Form state
   const [url, setUrl] = useState('');
@@ -90,9 +95,6 @@ const AddLinkScreen = () => {
   // Menu state
   const [categoryMenuVisible, setCategoryMenuVisible] = useState(false);
   const [tagsMenuVisible, setTagsMenuVisible] = useState(false);
-  
-  // Refs for menu anchors
-  const tagMenuAnchorRef = useRef(null);
 
   // Handle URL validation
   const validateUrl = (text: string) => {
@@ -114,7 +116,7 @@ const AddLinkScreen = () => {
     }
 
     // Enhanced URL validation
-    const urlPattern = /^(https?:\/\/)?(www\.)?([-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b)([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?$/;
+    const urlPattern = /^(https?:\/\/)?(www\.)?([-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b)([-a-zA-Z0-9()@:%_+.~#?&//=]*)?$/;
     if (!urlPattern.test(cleanText)) {
       setUrlError('Please enter a valid URL');
       return false;
@@ -158,31 +160,40 @@ const AddLinkScreen = () => {
     const isTitleValid = validateTitle(title);
 
     if (!isUrlValid || !isTitleValid) {
+      haptic.error();
       return;
     }
 
     // Process the URL and description using the helper function
     const { url: formattedUrl, description: cleanedDescription } = processYoutubeUrl(url, description);
-    
-    // Update the description state if it was changed
-    if (description !== cleanedDescription) {
-      setDescription(cleanedDescription);
-    }
 
     // Add link
     try {
+      haptic.medium();
       await addLink({
         url: formattedUrl,
         title,
-        description,
+        description: cleanedDescription,
         category: category || categories[0]?.id || '',
         tags: selectedTags,
         isFavorite,
       });
 
+      haptic.success();
+      toast.showToast({
+        message: 'Link added successfully!',
+        type: 'success',
+        duration: 2000,
+      });
       // Navigate back
       navigation.goBack();
     } catch (error) {
+      haptic.error();
+      toast.showToast({
+        message: 'Failed to add link. Please try again.',
+        type: 'error',
+        duration: 3000,
+      });
       console.error('Error adding link:', error);
     }
   };
@@ -210,6 +221,8 @@ const AddLinkScreen = () => {
           style={styles.input}
           error={!!urlError}
           left={<TextInput.Icon icon="link-variant" />}
+          outlineStyle={{ borderRadius: 16, borderWidth: 2 }}
+          contentStyle={{ paddingLeft: 8 }}
         />
         {!!urlError && <HelperText type="error">{urlError}</HelperText>}
 
@@ -221,6 +234,8 @@ const AddLinkScreen = () => {
           style={styles.input}
           error={!!titleError}
           left={<TextInput.Icon icon="format-title" />}
+          outlineStyle={{ borderRadius: 16, borderWidth: 2 }}
+          contentStyle={{ paddingLeft: 8 }}
         />
         {!!titleError && <HelperText type="error">{titleError}</HelperText>}
 
@@ -230,9 +245,11 @@ const AddLinkScreen = () => {
           onChangeText={setDescription}
           mode="outlined"
           multiline
-          numberOfLines={3}
-          style={styles.input}
+          numberOfLines={4}
+          style={[styles.input, { minHeight: 100 }]}
           left={<TextInput.Icon icon="text" />}
+          outlineStyle={{ borderRadius: 16, borderWidth: 2 }}
+          contentStyle={{ paddingLeft: 8 }}
         />
 
         <View style={styles.sectionTitle}>
@@ -243,24 +260,21 @@ const AddLinkScreen = () => {
           visible={categoryMenuVisible}
           onDismiss={() => setCategoryMenuVisible(false)}
           anchor={
-            <Chip
+            <Button
               mode="outlined"
-              onPress={() => setCategoryMenuVisible(true)}
+              onPress={() => setCategoryMenuVisible(!categoryMenuVisible)}
               style={styles.categoryChip}
-              avatar={
-                selectedCategory ? (
-                  <Icon name={selectedCategory.icon} size={20} color={selectedCategory.color} />
-                ) : undefined
-              }
+              contentStyle={styles.categoryButtonContent}
+              icon={selectedCategory ? selectedCategory.icon : 'folder'}
             >
               {selectedCategory ? selectedCategory.name : 'Select Category'}
-            </Chip>
+            </Button>
           }
         >
           {categories.map((cat) => (
             <Menu.Item
               key={cat.id}
-              leadingIcon={({ size, color }) => (
+              leadingIcon={({ size }) => (
                 <Icon name={cat.icon} size={size} color={cat.color} />
               )}
               onPress={() => handleCategorySelect(cat.id)}
@@ -339,14 +353,14 @@ const AddLinkScreen = () => {
           />
         </View>
 
-        <Button
+        <AnimatedButton
           mode="contained"
           onPress={handleSubmit}
           style={styles.submitButton}
           labelStyle={styles.submitButtonLabel}
         >
           Save Link
-        </Button>
+        </AnimatedButton>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -355,34 +369,50 @@ const AddLinkScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F8FAFC',
   },
   scrollContent: {
-    padding: 16,
-    paddingBottom: 32,
+    padding: 20,
+    paddingBottom: 40,
   },
   input: {
-    marginBottom: 16,
+    marginBottom: 20,
+    backgroundColor: '#FFFFFF',
   },
   sectionTitle: {
-    marginTop: 8,
-    marginBottom: 12,
+    marginTop: 16,
+    marginBottom: 16,
   },
   categoryChip: {
-    marginBottom: 16,
-    height: 40,
+    marginBottom: 20,
+    height: 52,
+    borderRadius: 16,
+    borderWidth: 2,
+  },
+  categoryButtonContent: {
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
   },
   tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 16,
+    marginBottom: 20,
+    gap: 8,
   },
   tagChip: {
     marginRight: 8,
     marginBottom: 8,
+    height: 36,
+    borderRadius: 18,
+    elevation: 2,
   },
   addTagChip: {
     marginRight: 8,
     marginBottom: 8,
+    height: 36,
+    borderRadius: 18,
+    elevation: 1,
   },
   tagsMenu: {
     marginTop: 40,
@@ -404,17 +434,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: 12,
+    padding: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    elevation: 2,
   },
   submitButton: {
-    marginTop: 16,
-    borderRadius: 8,
-    height: 50,
+    marginTop: 24,
+    borderRadius: 16,
+    height: 56,
     justifyContent: 'center',
+    elevation: 4,
+    shadowColor: '#7C3AED',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
   submitButtonLabel: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
 });
 

@@ -1,10 +1,11 @@
 import React, { memo } from 'react';
-import { StyleSheet, View, Linking, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Linking } from 'react-native';
 import { Surface, Text, IconButton, Chip, useTheme, TouchableRipple } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import OptimizedIcon from './OptimizedIcon';
 import { Link } from '../types';
 import { useApp } from '../context/AppContext';
-import { extractDomain } from '../utils/urlUtils.ts';
+import { extractDomain } from '../utils/urlUtils';
+import { useHaptic } from '../hooks/useHaptic';
 
 interface LinkCardProps {
   link: Link;
@@ -14,6 +15,7 @@ interface LinkCardProps {
 const LinkCard: React.FC<LinkCardProps> = memo(({ link, onPress }) => {
   const theme = useTheme();
   const { categories, tags, toggleFavoriteLink } = useApp();
+  const haptic = useHaptic();
   const styles = createStyles(theme);
 
   // Find the category for this link
@@ -27,12 +29,14 @@ const LinkCard: React.FC<LinkCardProps> = memo(({ link, onPress }) => {
 
   const handleFavoriteToggle = (e: any) => {
     e.stopPropagation();
+    haptic.light();
     toggleFavoriteLink(link.id);
   };
   
   // Handle opening the link directly
   const handleOpenLink = (e: any) => {
     e.stopPropagation();
+    haptic.light();
     const url = link.url.startsWith('http') ? link.url : `https://${link.url}`;
     Linking.openURL(url).catch(err => console.error('Error opening URL:', err));
   };
@@ -44,7 +48,7 @@ const LinkCard: React.FC<LinkCardProps> = memo(({ link, onPress }) => {
           <View style={styles.header}>
             {category && (
               <View style={[styles.categoryContainer, { backgroundColor: `${category.color}15` }]}>
-                <Icon 
+                <OptimizedIcon
                   name={category.icon} 
                   size={16} 
                   color={category.color} 
@@ -81,7 +85,7 @@ const LinkCard: React.FC<LinkCardProps> = memo(({ link, onPress }) => {
           </Text>
           
           <View style={styles.urlContainer}>
-            <Icon name="link-variant" size={14} color={theme.colors.primary} style={styles.urlIcon} />
+            <OptimizedIcon name="link-variant" size={14} color={theme.colors.primary} style={styles.urlIcon} />
             <Text variant="bodySmall" style={styles.url} numberOfLines={1}>
               {domain}
             </Text>
@@ -111,14 +115,14 @@ const LinkCard: React.FC<LinkCardProps> = memo(({ link, onPress }) => {
                   textStyle={{ color: theme.colors.onSurfaceVariant, fontSize: 12, lineHeight: 16 }}
                   compact
                 >
-                  +{linkTags.length - 3}
+                  {`+${linkTags.length - 3}`}
                 </Chip>
               )}
             </View>
           )}
           
           <View style={styles.dateContainer}>
-            <Icon name="clock-outline" size={12} color={theme.colors.onSurfaceVariant} style={styles.dateIcon} />
+            <OptimizedIcon name="clock-outline" size={12} color={theme.colors.onSurfaceVariant} style={styles.dateIcon} />
             <Text variant="labelSmall" style={styles.dateText}>
               {new Date(link.updatedAt).toLocaleDateString()}
             </Text>
@@ -132,29 +136,37 @@ const LinkCard: React.FC<LinkCardProps> = memo(({ link, onPress }) => {
 const createStyles = (theme: any) => StyleSheet.create({
   cardSurface: {
     marginBottom: 16,
-    marginHorizontal: 8,
-    borderRadius: 16,
+    marginHorizontal: 16,
+    borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: theme.colors.surface,
+    elevation: 4,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
   },
   ripple: {
-    borderRadius: 16,
+    borderRadius: 20,
   },
   cardContent: {
-    padding: 16,
+    padding: 20,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   categoryContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
     maxWidth: '70%',
   },
   categoryIcon: {
@@ -178,9 +190,10 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   title: {
     fontWeight: '700',
-    marginBottom: 10,
-    lineHeight: 22,
-    fontSize: 16,
+    marginBottom: 12,
+    lineHeight: 24,
+    fontSize: 17,
+    letterSpacing: -0.3,
   },
   urlContainer: {
     flexDirection: 'row',
@@ -197,9 +210,10 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   description: {
     marginBottom: 16,
-    lineHeight: 20,
-    opacity: 0.8,
+    lineHeight: 22,
+    opacity: 0.75,
     fontSize: 14,
+    color: theme.colors.onSurfaceVariant,
   },
   tagsContainer: {
     flexDirection: 'row',
@@ -209,12 +223,13 @@ const createStyles = (theme: any) => StyleSheet.create({
     alignItems: 'center',
   },
   tag: {
-    marginRight: 6,
-    marginBottom: 4,
-    height: 28,
-    borderRadius: 14,
-    paddingHorizontal: 8,
+    marginRight: 8,
+    marginBottom: 6,
+    height: 30,
+    borderRadius: 15,
+    paddingHorizontal: 10,
     justifyContent: 'center',
+    elevation: 1,
   },
   moreTag: {
     marginRight: 6,

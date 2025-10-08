@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
-import { TextInput, Button, Chip, HelperText, useTheme, Switch, Text } from 'react-native-paper';
+import { TextInput, Chip, HelperText, useTheme, Switch, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useApp } from '../context/AppContext';
+import { useToast } from '../components/Toast';
+import AnimatedButton from '../components/AnimatedButton';
 import { RootStackParamList } from '../navigation';
 
 type AddNoteScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -12,6 +14,7 @@ const AddNoteScreen = () => {
   const theme = useTheme();
   const navigation = useNavigation<AddNoteScreenNavigationProp>();
   const { addNote, categories, tags } = useApp();
+  const toast = useToast();
   
   // Form state
   const [title, setTitle] = useState('');
@@ -62,17 +65,32 @@ const AddNoteScreen = () => {
   };
   
   // Handle save note
-  const handleSaveNote = () => {
+  const handleSaveNote = async () => {
     if (validateForm()) {
-      addNote({
-        title: title.trim(),
-        content: content.trim(),
-        category: categoryId || categories[0]?.id || '', // Changed from categoryId to category
-        tags: selectedTagIds, // Changed from tagIds to tags
-        isFavorite,
-      });
-      
-      navigation.goBack();
+      try {
+        await addNote({
+          title: title.trim(),
+          content: content.trim(),
+          category: categoryId || categories[0]?.id || '', // Changed from categoryId to category
+          tags: selectedTagIds, // Changed from tagIds to tags
+          isFavorite,
+        });
+        
+        toast.showToast({
+          message: 'Note saved successfully!',
+          type: 'success',
+          duration: 2000,
+        });
+        
+        navigation.goBack();
+      } catch (error) {
+        toast.showToast({
+          message: 'Failed to save note. Please try again.',
+          type: 'error',
+          duration: 3000,
+        });
+        console.error('Error saving note:', error);
+      }
     }
   };
   
@@ -154,13 +172,13 @@ const AddNoteScreen = () => {
           />
         </View>
         
-        <Button
+        <AnimatedButton
           mode="contained"
           onPress={handleSaveNote}
           style={styles.saveButton}
         >
           Save Note
-        </Button>
+        </AnimatedButton>
       </ScrollView>
     </KeyboardAvoidingView>
   );

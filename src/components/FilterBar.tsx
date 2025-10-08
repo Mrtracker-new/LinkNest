@@ -99,14 +99,14 @@ const FilterBar: React.FC<FilterBarProps> = memo(({
               anchor={
                 <Chip
                   mode="outlined"
-                  onPress={() => setCategoryMenuVisible(true)}
+                  onPress={() => setCategoryMenuVisible(!categoryMenuVisible)}
                   style={styles.menuChip}
                   icon={selectedCategory ? 'check-circle' : 'shape-outline'}
                   selectedColor={selectedCategory ? theme.colors.primary : undefined}
                   selected={selectedCategory !== null}
                 >
                   {selectedCategory 
-                    ? categories.find(c => c.id === selectedCategory)?.name 
+                    ? (categories.find(c => c.id === selectedCategory)?.name || 'Category')
                     : 'Category'}
                 </Chip>
               }
@@ -123,8 +123,8 @@ const FilterBar: React.FC<FilterBarProps> = memo(({
               {categories.map((category) => (
                 <Menu.Item
                   key={category.id}
-                  leadingIcon={({size, color}) => (
-                    <Icon name={category.icon} size={size} color={category.color} />
+                  leadingIcon={({size}) => (
+                    <Icon name={category.icon || 'shape'} size={size} color={category.color || theme.colors.primary} />
                   )}
                   onPress={() => {
                     handleCategoryPress(category.id);
@@ -142,7 +142,7 @@ const FilterBar: React.FC<FilterBarProps> = memo(({
               anchor={
                 <Chip
                   mode="outlined"
-                  onPress={() => setTagsMenuVisible(true)}
+                  onPress={() => setTagsMenuVisible(!tagsMenuVisible)}
                   style={styles.menuChip}
                   icon={selectedTags.length > 0 ? 'check-circle' : 'tag-outline'}
                   selectedColor={selectedTags.length > 0 ? theme.colors.primary : undefined}
@@ -167,7 +167,7 @@ const FilterBar: React.FC<FilterBarProps> = memo(({
                 <Menu.Item
                   key={tag.id}
                   leadingIcon={({size}) => (
-                    <View style={[styles.tagDot, {backgroundColor: tag.color}]} />
+                    <View style={[styles.tagDot, {backgroundColor: tag.color || theme.colors.primary}]} />
                   )}
                   onPress={() => {
                     handleTagPress(tag.id);
@@ -185,7 +185,7 @@ const FilterBar: React.FC<FilterBarProps> = memo(({
               anchor={
                 <Chip
                   mode="outlined"
-                  onPress={() => setSortMenuVisible(true)}
+                  onPress={() => setSortMenuVisible(!sortMenuVisible)}
                   style={styles.menuChip}
                   icon={getSortIcon()}
                 >
@@ -236,11 +236,11 @@ const FilterBar: React.FC<FilterBarProps> = memo(({
                   <Icon 
                     name={categories.find(c => c.id === selectedCategory)?.icon || 'shape-outline'} 
                     size={16} 
-                    color={categories.find(c => c.id === selectedCategory)?.color} 
+                    color={categories.find(c => c.id === selectedCategory)?.color || theme.colors.primary} 
                   />
                 }
               >
-                {categories.find(c => c.id === selectedCategory)?.name}
+                {categories.find(c => c.id === selectedCategory)?.name || 'Category'}
               </Chip>
             )}
             
@@ -252,10 +252,10 @@ const FilterBar: React.FC<FilterBarProps> = memo(({
                   key={tag.id}
                   mode="flat"
                   onClose={() => handleTagPress(tag.id)}
-                  style={[styles.activeFilterChip, {backgroundColor: `${tag.color}20`}]}
-                  selectedColor={tag.color}
+                  style={[styles.activeFilterChip, {backgroundColor: `${tag.color || theme.colors.primary}20`}]}
+                  selectedColor={tag.color || theme.colors.primary}
                 >
-                  {tag.name}
+                  {tag.name || 'Unnamed Tag'}
                 </Chip>
               );
             })}

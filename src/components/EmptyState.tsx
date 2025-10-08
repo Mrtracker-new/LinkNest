@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { StyleSheet, View, Animated } from 'react-native';
 import { Text, Button, useTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -19,9 +19,27 @@ const EmptyState: React.FC<EmptyStateProps> = ({
   onAction,
 }) => {
   const theme = useTheme();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        tension: 40,
+        friction: 7,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, scaleAnim]);
 
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
       <View style={[styles.iconContainer, { backgroundColor: `${theme.colors.primary}10` }]}>
         <Icon
           name={icon}
@@ -45,7 +63,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
           {actionLabel}
         </Button>
       )}
-    </View>
+    </Animated.View>
   );
 };
 

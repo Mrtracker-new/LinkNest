@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useColorScheme, Platform } from 'react-native';
+import { Platform } from 'react-native';
 import uuid from 'react-native-uuid';
 import RNFS from 'react-native-fs';
 import { Link, Category, Tag, Note, Document } from '../types';

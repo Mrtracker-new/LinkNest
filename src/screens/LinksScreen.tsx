@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { StyleSheet, View, FlatList, RefreshControl, StatusBar, Animated } from 'react-native';
-import { Text, FAB, useTheme, Searchbar, ActivityIndicator, Banner } from 'react-native-paper';
+import { useDebounce } from '../utils/debounce';
+import { Text, useTheme, Searchbar, ActivityIndicator, Banner } from 'react-native-paper';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation';
@@ -8,6 +9,9 @@ import { useApp } from '../context/AppContext';
 import LinkCard from '../components/LinkCard';
 import FilterBar from '../components/FilterBar';
 import EmptyState from '../components/EmptyState';
+import { SkeletonCard } from '../components/SkeletonLoader';
+import { useToast } from '../components/Toast';
+import AnimatedFAB from '../components/AnimatedFAB';
 import { Link } from '../types';
 
 type LinksScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -17,13 +21,13 @@ const LinksScreen = () => {
   const theme = useTheme();
   const navigation = useNavigation<LinksScreenNavigationProp>();
   const route = useRoute<LinksScreenRouteProp>();
-  const { links, isLoading } = useApp();
+  const { links, isLoading, categories } = useApp();
+  const toast = useToast();
   
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    route.params?.categoryId || null
-  );
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'alphabetical' | 'favorites'>('newest');
   const [showBanner, setShowBanner] = useState(false);
@@ -32,54 +36,67 @@ const LinksScreen = () => {
   const scrollY = new Animated.Value(0);
   const styles = createStyles(theme);
   
-  // Reset filters when screen comes into focus
-  useFocusEffect(
-    useCallback(() => {
-      // Update category from route params if provided
-      if (route.params?.categoryId) {
-        setSelectedCategory(route.params.categoryId);
+  // Update category from route params only when explicitly provided from navigation
+  useEffect(() => {
+    if (route.params?.categoryId !== undefined) {
+      // Set the category when coming from HomeScreen or other navigation
+      setSelectedCategory(route.params.categoryId);
+      
+      // Show a toast notification to inform user about the filter
+      const category = categories.find(cat => cat.id === route.params?.categoryId);
+      if (category) {
+        toast.showToast({
+          message: `Filtered by ${category.name}`,
+          type: 'info',
+          duration: 2000,
+        });
       }
-      return () => {};
-    }, [route.params?.categoryId])
-  );
-
-  // Filter and sort links
-  const filteredLinks = links.filter((link) => {
-    // Filter by search query
-    const matchesSearch =
-      searchQuery === '' ||
-      link.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      link.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (link.description && link.description.toLowerCase().includes(searchQuery.toLowerCase()));
-
-    // Filter by category
-    const matchesCategory = selectedCategory === null || link.category === selectedCategory;
-
-    // Filter by tags
-    const matchesTags =
-      selectedTags.length === 0 ||
-      selectedTags.some((tagId) => link.tags.includes(tagId));
-
-    return matchesSearch && matchesCategory && matchesTags;
-  });
-
-  // Sort links
-  const sortedLinks = [...filteredLinks].sort((a, b) => {
-    switch (sortBy) {
-      case 'newest':
-        return b.updatedAt - a.updatedAt;
-      case 'oldest':
-        return a.updatedAt - b.updatedAt;
-      case 'alphabetical':
-        return a.title.localeCompare(b.title);
-      case 'favorites':
-        if (a.isFavorite && !b.isFavorite) return -1;
-        if (!a.isFavorite && b.isFavorite) return 1;
-        return b.updatedAt - a.updatedAt;
-      default:
-        return 0;
+      
+      // Clear the route params immediately after applying
+      // This ensures the filter doesn't persist when switching tabs
+      navigation.setParams({ categoryId: undefined } as any);
     }
-  });
+  }, [route.params?.categoryId, navigation, categories, toast]);
+
+  // Filter and sort links with useMemo for performance
+  const sortedLinks = useMemo(() => {
+    const filtered = links.filter((link) => {
+      // Filter by search query
+      const matchesSearch =
+        debouncedSearchQuery === '' ||
+        link.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        link.url.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        (link.description && link.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase()));
+
+      // Filter by category
+      const matchesCategory = selectedCategory === null || link.category === selectedCategory;
+
+      // Filter by tags
+      const matchesTags =
+        selectedTags.length === 0 ||
+        selectedTags.some((tagId) => link.tags.includes(tagId));
+
+      return matchesSearch && matchesCategory && matchesTags;
+    });
+
+    // Sort links
+    return [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          return b.updatedAt - a.updatedAt;
+        case 'oldest':
+          return a.updatedAt - b.updatedAt;
+        case 'alphabetical':
+          return a.title.localeCompare(b.title);
+        case 'favorites':
+          if (a.isFavorite && !b.isFavorite) return -1;
+          if (!a.isFavorite && b.isFavorite) return 1;
+          return b.updatedAt - a.updatedAt;
+        default:
+          return 0;
+      }
+    });
+  }, [links, debouncedSearchQuery, selectedCategory, selectedTags, sortBy]);
 
   // Handle search
   const handleSearch = (query: string) => {
@@ -96,14 +113,14 @@ const LinksScreen = () => {
   };
 
   // Navigate to link details
-  const navigateToLinkDetails = (id: string) => {
+  const navigateToLinkDetails = useCallback((id: string) => {
     navigation.navigate('LinkDetails', { id });
-  };
+  }, [navigation]);
 
-  // Render link item
-  const renderLinkItem = ({ item }: { item: Link }) => (
+  // Render link item with useCallback for performance
+  const renderLinkItem = useCallback(({ item }: { item: Link }) => (
     <LinkCard link={item} onPress={() => navigateToLinkDetails(item.id)} />
-  );
+  ), [navigateToLinkDetails]);
 
   // Calculate header opacity based on scroll position
   const headerOpacity = scrollY.interpolate({
@@ -191,9 +208,10 @@ const LinksScreen = () => {
       )}
 
       {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text style={styles.loadingText}>Loading links...</Text>
+        <View style={styles.listContent}>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <SkeletonCard key={index} style={{ marginBottom: 12 }} />
+          ))}
         </View>
       ) : sortedLinks.length === 0 ? (
         <EmptyState
@@ -213,31 +231,36 @@ const LinksScreen = () => {
           renderItem={renderLinkItem}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
-          refreshControl={
-            <RefreshControl 
-              refreshing={refreshing} 
-              onRefresh={onRefresh} 
-              colors={[theme.colors.primary]}
-              tintColor={theme.colors.primary}
-            />
-          }
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
             { useNativeDriver: false }
           )}
-          showsVerticalScrollIndicator={false}
-          initialNumToRender={10}
+          scrollEventThrottle={16}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[theme.colors.primary]}
+              tintColor={theme.colors.primary}
+            />
+          }
+          removeClippedSubviews={true}
           maxToRenderPerBatch={10}
+          updateCellsBatchingPeriod={50}
+          initialNumToRender={10}
           windowSize={10}
+          getItemLayout={(data, index) => ({
+            length: 180,
+            offset: 180 * index,
+            index,
+          })}
         />
       )}
 
-      <FAB
+      <AnimatedFAB
         icon="plus"
-        style={[styles.fab, { backgroundColor: theme.colors.primary }]}
         onPress={handleAddLink}
         color={theme.colors.onPrimary}
-        animated={true}
       />
     </View>
   );

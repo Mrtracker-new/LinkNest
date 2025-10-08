@@ -14,26 +14,32 @@ import { PaperProvider } from 'react-native-paper';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, useThemeContext } from './src/context/ThemeContext';
 import { AppProvider } from './src/context/AppContext';
+import { ToastProvider } from './src/components/Toast';
 import AppNavigator from './src/navigation';
+import ErrorBoundary from './src/components/ErrorBoundary';
 
 const AppContent = () => {
   const { theme, isDarkMode, navigationTheme } = useThemeContext();
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <PaperProvider theme={theme}>
-        <NavigationContainer theme={navigationTheme}>
-          <StatusBar
-            barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-            backgroundColor={theme.colors.surface}
-            translucent={false}
-          />
-          <AppProvider>
-            <AppNavigator />
-          </AppProvider>
-        </NavigationContainer>
-      </PaperProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <PaperProvider theme={theme}>
+          <NavigationContainer theme={navigationTheme}>
+            <StatusBar
+              barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+              backgroundColor={theme.colors.surface}
+              translucent={false}
+            />
+            <AppProvider>
+              <ToastProvider>
+                <AppNavigator />
+              </ToastProvider>
+            </AppProvider>
+          </NavigationContainer>
+        </PaperProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 };
 

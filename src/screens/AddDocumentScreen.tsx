@@ -29,6 +29,12 @@ const AddDocumentScreen = () => {
     }
     
     try {
+      // Android 13+ (API level 33+) doesn't require storage permissions for document picker
+      if (Platform.Version >= 33) {
+        return true;
+      }
+      
+      // Android 12 and below - request READ_EXTERNAL_STORAGE permission
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
         {
