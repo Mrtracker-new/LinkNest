@@ -98,6 +98,11 @@ firebase_options.dart
 .AppleDouble
 .LSOverride
 
+# Windows system files
+desktop.ini
+Thumbs.db
+ehthumbs.db
+
 # Thumbnails
 ._*
 
