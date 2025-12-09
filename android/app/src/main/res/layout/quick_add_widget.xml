@@ -11,12 +11,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:text="Quick Actions"
+        android:text="QUICK ACTIONS"
         android:textSize="12sp"
         android:textColor="#AAAAAA"
         android:textStyle="bold"
         android:letterSpacing="0.1"
-        android:isAllCaps="true"
         android:paddingBottom="12dp" />
 
     <!-- Buttons Container -->
