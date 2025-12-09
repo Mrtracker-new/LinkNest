@@ -85,29 +85,104 @@ class _DocsScreenState extends ConsumerState<DocsScreen> {
               separatorBuilder: (c, i) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 final doc = sortedDocs[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                    child: Icon(_getIconForType(doc.fileType), color: Theme.of(context).colorScheme.primary),
-                  ),
-                  title: Text(doc.title),
-                  subtitle: Text('${doc.fileType.toUpperCase()} • ${_formatBytes(doc.fileSize)}'),
-                  onTap: () => _openFile(context, doc),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined, size: 20),
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (context) => EditDocumentDialog(document: doc),
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: InkWell(
+                    onTap: () => _openFile(context, doc),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                              child: Icon(_getIconForType(doc.fileType), color: Theme.of(context).colorScheme.primary),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    doc.title,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${doc.fileType.toUpperCase()} • ${_formatBytes(doc.fileSize)}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (doc.isFavorite)
+                              const Icon(
+                                Icons.star,
+                                color: Colors.orange,
+                                size: 20,
+                              ),
+                            IconButton(
+                              icon: const Icon(Icons.edit_outlined, size: 20),
+                              onPressed: () => showDialog(
+                                context: context,
+                                builder: (context) => EditDocumentDialog(document: doc),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              onPressed: () => _deleteDoc(context, ref, doc),
+                            ),
+                          ],
                         ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline),
-                        onPressed: () => _deleteDoc(context, ref, doc),
-                      ),
-                    ],
+                        // Tags
+                        if (doc.tags.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: doc.tags.map((tag) {
+                              final tagColor = tag.color != null 
+                                  ? Color(tag.color!) 
+                                  : Theme.of(context).colorScheme.primary;
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: tagColor.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                    color: tagColor.withOpacity(0.3),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Text(
+                                  tag.name,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: tagColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                   ),
                 );
               },
