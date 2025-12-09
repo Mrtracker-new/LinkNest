@@ -316,22 +316,33 @@ class StatisticsScreen extends ConsumerWidget {
                 iconColor = Colors.purple;
               }
 
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: iconColor.withOpacity(0.1),
-                  child: Icon(icon, size: 20, color: iconColor),
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: iconColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(icon, color: iconColor, size: 20),
+                  ),
+                  title: Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  subtitle: Text(
+                    item.type.name.toUpperCase(),
+                    style: TextStyle(fontSize: 11, color: iconColor, fontWeight: FontWeight.w500),
+                  ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (item.isFavorite)
+                        const Icon(Icons.star, color: Colors.orange, size: 20),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.arrow_forward_ios, size: 16),
+                    ],
+                  ),
+                  onTap: () => AppActions.openItem(context, item),
                 ),
-                title: Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis),
-                subtitle: Text(
-                  _formatDate(item.updatedAt),
-                  style: const TextStyle(fontSize: 12),
-                ),
-                trailing: Icon(
-                  item.isFavorite ? Icons.star : Icons.star_border,
-                  color: item.isFavorite ? Colors.orange : Colors.grey,
-                  size: 20,
-                ),
-                onTap: () => AppActions.openItem(context, item),
               ).animate().fadeIn(duration: 300.ms, delay: (index * 50).ms);
             },
           ),
