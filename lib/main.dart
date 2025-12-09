@@ -16,6 +16,9 @@ import 'package:linknest/presentation/feature_tags/tag_items_screen.dart';
 import 'package:linknest/presentation/feature_settings/settings_screen.dart';
 import 'package:linknest/presentation/feature_home/favorites_screen.dart';
 import 'package:linknest/presentation/providers/providers.dart';
+import 'package:linknest/presentation/widgets/home_widget_manager.dart';
+import 'package:home_widget/home_widget.dart';
+import 'dart:async';
 
 final _router = GoRouter(
   initialLocation: '/',
@@ -80,9 +83,41 @@ final _router = GoRouter(
   ],
 );
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Set up widget deep link listener
+  HomeWidget.widgetClicked.listen((uri) {
+    if (uri != null) {
+      _handleWidgetDeepLink(uri);
+    }
+  });
+  
   runApp(const ProviderScope(child: LinkNestApp()));
 }
+
+// Handle deep links from widget
+void _handleWidgetDeepLink(Uri uri) {
+  final path = uri.host;
+  String? route;
+  
+  switch (path) {
+    case 'add_link':
+      route = '/links';
+      break;
+    case 'add_document':
+      route = '/docs';
+      break;
+    case 'add_note':
+      route = '/notes/edit';
+      break;
+  }
+  
+  if (route != null) {
+    _router.push(route);
+  }
+}
+
 
 class LinkNestApp extends ConsumerWidget {
   const LinkNestApp({super.key});

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">LinkNest</string>
+    <string name="widget_description">Quick shortcuts to add links, documents, or notes</string>
+</resources>
