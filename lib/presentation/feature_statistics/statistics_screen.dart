@@ -309,7 +309,7 @@ class StatisticsScreen extends ConsumerWidget {
                 icon = style.$1;
                 iconColor = style.$2;
               } else if (item is DocumentItem) {
-                icon = Icons.description;
+                icon = _getDocumentIcon(item.fileType);
                 iconColor = Colors.orange;
               } else {
                 icon = Icons.edit_note;
@@ -383,6 +383,26 @@ class StatisticsScreen extends ConsumerWidget {
       return (Icons.menu_book, Colors.indigo);
     } else {
       return (Icons.language, Colors.blue);
+    }
+  }
+
+  // Helper to get document icon based on file type
+  IconData _getDocumentIcon(String type) {
+    switch (type.toLowerCase()) {
+      case 'pdf': return Icons.picture_as_pdf;
+      case 'doc':
+      case 'docx': return Icons.description;
+      case 'xls': 
+      case 'xlsx': return Icons.table_chart;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'webp': return Icons.image;
+      case 'txt': return Icons.text_snippet;
+      case 'json':
+      case 'xml': return Icons.code;
+      default: return Icons.insert_drive_file;
     }
   }
 
