@@ -370,11 +370,32 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
           if (_selectedTags.isNotEmpty) ...[
             Wrap(
               spacing: 8,
+              runSpacing: 8,
               children: _selectedTags
-                  .map((tag) => Chip(
-                        label: Text(tag.name, style: const TextStyle(fontSize: 12)),
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                      ))
+                  .map((tag) {
+                    final tagColor = tag.color != null 
+                        ? Color(tag.color!) 
+                        : Theme.of(context).colorScheme.primary;
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: tagColor.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: tagColor.withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        tag.name,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: tagColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    );
+                  })
                   .toList(),
             ),
             const SizedBox(height: 20),
@@ -396,11 +417,11 @@ class _NoteEditorScreenState extends ConsumerState<NoteEditorScreen> {
                 h3: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 p: const TextStyle(fontSize: 16, height: 1.5),
                 code: TextStyle(
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
                   fontFamily: 'monospace',
                 ),
                 codeblockDecoration: BoxDecoration(
-                  color: Colors.grey.shade200,
+                  color: Theme.of(context).colorScheme.surfaceVariant,
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
