@@ -86,44 +86,85 @@ final _router = GoRouter(
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Set up widget deep link listener
-  HomeWidget.widgetClicked.listen((uri) {
-    if (uri != null) {
-      _handleWidgetDeepLink(uri);
-    }
-  });
-  
   runApp(const ProviderScope(child: LinkNestApp()));
 }
 
-// Handle deep links from widget
-void _handleWidgetDeepLink(Uri uri) {
-  final path = uri.host;
-  String? route;
-  
-  switch (path) {
-    case 'add_link':
-      route = '/links';
-      break;
-    case 'add_document':
-      route = '/docs';
-      break;
-    case 'add_note':
-      route = '/notes/edit';
-      break;
-  }
-  
-  if (route != null) {
-    _router.push(route);
-  }
-}
-
-
-class LinkNestApp extends ConsumerWidget {
+class LinkNestApp extends ConsumerStatefulWidget {
   const LinkNestApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LinkNestApp> createState() => _LinkNestAppState();
+}
+
+class _LinkNestAppState extends ConsumerState<LinkNestApp> {
+  StreamSubscription<Uri?>? _widgetUriSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkForWidgetLaunch();
+    _listenForWidgetClicks();
+  }
+
+  @override
+  void dispose() {
+    _widgetUriSubscription?.cancel();
+    super.dispose();
+  }
+
+  // Check if app was launched from widget
+  Future<void> _checkForWidgetLaunch() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      final Uri? initialUri = await HomeWidget.initiallyLaunchedFromHomeWidget();
+      if (initialUri != null) {
+        _handleWidgetUri(initialUri);
+      }
+    } catch (e) {
+      debugPrint('Error checking initial widget URI: $e');
+    }
+  }
+
+  // Listen for widget clicks while app is running
+  void _listenForWidgetClicks() {
+    _widgetUriSubscription = HomeWidget.widgetClicked.listen((uri) {
+      if (uri != null) {
+        _handleWidgetUri(uri);
+      }
+    });
+  }
+
+  // Handle the widget URI and navigate
+  void _handleWidgetUri(Uri uri) {
+    final path = uri.host;
+    String? route;
+    
+    debugPrint('Widget clicked with URI: $uri');
+    
+    switch (path) {
+      case 'add_link':
+        route = '/links';
+        break;
+      case 'add_document':
+        route = '/docs';
+        break;
+      case 'add_note':
+        route = '/notes/edit';
+        break;
+    }
+    
+    if (route != null) {
+      // Delay navigation to ensure router is ready
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted) {
+          _router.go(route);
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp.router(
