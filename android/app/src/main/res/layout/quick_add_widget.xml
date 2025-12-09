@@ -4,25 +4,28 @@
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
     android:orientation="vertical"
-    android:padding="12dp">
+    android:padding="16dp"
+    android:gravity="center">
 
     <!-- Widget Header -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="LinkNest Quick Add"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
         android:gravity="center"
-        android:paddingBottom="8dp" />
+        android:paddingBottom="16dp"
+        android:letterSpacing="0.05" />
 
     <!-- Quick Add Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:gravity="center"
+        android:weightSum="3">
 
         <!-- Add Link Button -->
         <LinearLayout
@@ -32,11 +35,11 @@
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="8dp">
+            android:padding="12dp">
             
             <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:src="@drawable/ic_link"
                 android:contentDescription="Add Link" />
             
@@ -44,9 +47,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Link"
-                android:textSize="11sp"
+                android:textSize="13sp"
+                android:textStyle="bold"
                 android:textColor="#4CAF50"
-                android:paddingTop="4dp" />
+                android:paddingTop="8dp" />
         </LinearLayout>
 
         <!-- Add Document Button -->
@@ -57,21 +61,22 @@
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="8dp">
+            android:padding="12dp">
             
             <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:src="@drawable/ic_document"
                 android:contentDescription="Add Document" />
             
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Document"
-                android:textSize="11sp"
+                android:text="Doc"
+                android:textSize="13sp"
+                android:textStyle="bold"
                 android:textColor="#FF9800"
-                android:paddingTop="4dp" />
+                android:paddingTop="8dp" />
         </LinearLayout>
 
         <!-- Add Note Button -->
@@ -82,11 +87,11 @@
             android:layout_weight="1"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="8dp">
+            android:padding="12dp">
             
             <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:src="@drawable/ic_note"
                 android:contentDescription="Add Note" />
             
@@ -94,9 +99,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Note"
-                android:textSize="11sp"
+                android:textSize="13sp"
+                android:textStyle="bold"
                 android:textColor="#9C27B0"
-                android:paddingTop="4dp" />
+                android:paddingTop="8dp" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
