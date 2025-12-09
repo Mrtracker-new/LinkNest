@@ -97,9 +97,17 @@ class _DocsScreenState extends ConsumerState<DocsScreen> {
                         children: [
                           Row(
                           children: [
-                            CircleAvatar(
-                              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                              child: Icon(_getIconForType(doc.fileType), color: Theme.of(context).colorScheme.primary),
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                _getIconForType(doc.fileType),
+                                color: Colors.orange,
+                                size: 20,
+                              ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -328,8 +336,12 @@ class _DocsScreenState extends ConsumerState<DocsScreen> {
       case 'xlsx': return Icons.table_chart;
       case 'jpg':
       case 'jpeg':
-      case 'png': return Icons.image;
+      case 'png':
+      case 'gif':
+      case 'webp': return Icons.image;
       case 'txt': return Icons.text_snippet;
+      case 'json':
+      case 'xml': return Icons.code;
       default: return Icons.insert_drive_file;
     }
   }
