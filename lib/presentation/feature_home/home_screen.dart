@@ -166,7 +166,8 @@ class HomeScreen extends ConsumerWidget {
                         icon = style.icon;
                         color = style.color;
                       } else if (item is DocumentItem) {
-                        icon = Icons.description;
+                        // Use file-type-specific icons for documents
+                        icon = _getDocumentIcon(item.fileType);
                         color = Colors.orange;
                       } else {
                         icon = Icons.edit_note;
@@ -223,6 +224,26 @@ class HomeScreen extends ConsumerWidget {
       if (domain.contains('docs.') || domain.contains('documentation')) return LinkStyle(Colors.indigo, Icons.menu_book);
     } catch (e) {}
     return LinkStyle(Colors.blue, Icons.language);
+  }
+
+  // Helper to get document icon based on file type
+  IconData _getDocumentIcon(String type) {
+    switch (type.toLowerCase()) {
+      case 'pdf': return Icons.picture_as_pdf;
+      case 'doc':
+      case 'docx': return Icons.description;
+      case 'xls': 
+      case 'xlsx': return Icons.table_chart;
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'webp': return Icons.image;
+      case 'txt': return Icons.text_snippet;
+      case 'json':
+      case 'xml': return Icons.code;
+      default: return Icons.insert_drive_file;
+    }
   }
 
   void _openItem(BuildContext context, Item item) {
