@@ -347,20 +347,33 @@ class _LinksScreenState extends ConsumerState<LinksScreen> {
                               spacing: 6,
                               runSpacing: 6,
                               children: link.tags
-                                  .map((tag) => Container(
+                                  .map((tag) {
+                                    final tagColor = tag.color != null 
+                                        ? Color(tag.color!) 
+                                        : Theme.of(context).colorScheme.primary;
+                                    return Container(
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 8,
                                           vertical: 4,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: Colors.grey.shade200,
+                                          color: tagColor.withOpacity(0.15),
                                           borderRadius: BorderRadius.circular(4),
+                                          border: Border.all(
+                                            color: tagColor.withOpacity(0.3),
+                                            width: 1,
+                                          ),
                                         ),
                                         child: Text(
                                           tag.name,
-                                          style: const TextStyle(fontSize: 11),
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: tagColor,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
-                                      ))
+                                      );
+                                  })
                                   .toList(),
                             ),
                           ],
