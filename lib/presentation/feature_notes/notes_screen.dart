@@ -171,6 +171,41 @@ class _NotesScreenState extends ConsumerState<NotesScreen> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 8),
+                          // Tags
+                          if (note.tags.isNotEmpty) ...[
+                            Wrap(
+                              spacing: 4,
+                              runSpacing: 4,
+                              children: note.tags.map((tag) {
+                                final tagColor = tag.color != null 
+                                    ? Color(tag.color!) 
+                                    : Theme.of(context).colorScheme.primary;
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: tagColor.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(
+                                      color: tagColor.withOpacity(0.3),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    tag.name,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: tagColor,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                            const SizedBox(height: 8),
+                          ],
                           Expanded(
                             child: Text(
                               note.content,
