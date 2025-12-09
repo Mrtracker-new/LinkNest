@@ -83,7 +83,18 @@ class AppDatabase extends _$AppDatabase {
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
+    
+    // Ensure the directory exists
+    if (!await dbFolder.exists()) {
+      await dbFolder.create(recursive: true);
+    }
+    
     final file = File(p.join(dbFolder.path, 'db.sqlite'));
+    
+    // Ensure parent directory exists for the database file
+    if (!await file.parent.exists()) {
+      await file.parent.create(recursive: true);
+    }
 
     // Also work around limitations on old Android versions
     if (Platform.isAndroid) {
