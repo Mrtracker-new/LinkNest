@@ -33,7 +33,6 @@ LinkNest is your personal knowledge vault that lives entirely on your device. No
    ```bash
    git clone https://github.com/Mrtracker-new/LinkNest.git
    cd LinkNest
-   git checkout 2.0
    ```
 
 2. **Get those dependencies:**
