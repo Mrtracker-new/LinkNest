@@ -146,11 +146,78 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ),
           ),
 
+          // Tag Filter
+          tagsAsync.when(
+            data: (tags) {
+              if (tags.isEmpty) return const SizedBox.shrink();
+              
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.label, size: 16),
+                        const SizedBox(width: 4),
+                        const Text('Filter by tag:', style: TextStyle(fontSize: 12)),
+                        if (_selectedTag != null) ...[
+                          const SizedBox(width: 8),
+                          TextButton(
+                            onPressed: () => setState(() => _selectedTag = null),
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              minimumSize: const Size(0, 24),
+                            ),
+                            child: const Text('Clear', style: TextStyle(fontSize: 11)),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: tags.map((tag) {
+                        final isSelected = _selectedTag == tag.id;
+                        final tagColor = tag.color != null 
+                            ? Color(tag.color!) 
+                            : Theme.of(context).colorScheme.primary;
+                        
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: FilterChip(
+                            avatar: CircleAvatar(
+                              backgroundColor: tagColor,
+                              radius: 8,
+                            ),
+                            label: Text(tag.name),
+                            selected: isSelected,
+                            onSelected: (_) {
+                              setState(() {
+                                _selectedTag = isSelected ? null : tag.id;
+                              });
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              );
+            },
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+
           const SizedBox(height: 8),
 
           // Results
           Expanded(
-            child: _query.isEmpty
+            child: (_query.isEmpty && _selectedTag == null && !_favoritesOnly && _selectedType == SearchFilterType.all)
                 ? Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -158,20 +225,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         Icon(Icons.search, size: 64, color: Colors.grey.shade400),
                         const SizedBox(height: 16),
                         Text(
-                          'Start searching',
+                          'Start searching or filtering',
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                 color: Colors.grey,
                               ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Find links, documents, and notes',
+                          'Use search or filters above',
                           style: TextStyle(color: Colors.grey.shade600),
                         ),
                       ],
                     ),
                   )
-                : searchAsync.when(
+                : ref.watch(_query.isNotEmpty ? uniqueSearchProvider(_query) : allItemsProvider).when(
                     data: (searchResults) {
                       final results = _filterResults(searchResults);
 
@@ -216,14 +283,56 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
+  // Helper to extract domain from URL
+  String _getDomain(String url) {
+    try {
+      final uri = Uri.parse(url);
+      return uri.host.replaceAll('www.', '');
+    } catch (e) {
+      return url;
+    }
+  }
+
+  // Helper to get color and icon based on domain (same as links_screen.dart)
+  (IconData, Color) _getLinkStyle(String url) {
+    final domain = _getDomain(url).toLowerCase();
+    
+    if (domain.contains('github')) {
+      return (Icons.code, Colors.black);
+    } else if (domain.contains('youtube') || domain.contains('youtu.be')) {
+      return (Icons.play_circle, Colors.red);
+    } else if (domain.contains('twitter') || domain.contains('x.com')) {
+      return (Icons.tag, Colors.blue);
+    } else if (domain.contains('linkedin')) {
+      return (Icons.work, Colors.blue.shade700);
+    } else if (domain.contains('medium') || domain.contains('dev.to')) {
+      return (Icons.article, Colors.green.shade700);
+    } else if (domain.contains('stackoverflow')) {
+      return (Icons.question_answer, Colors.orange);
+    } else if (domain.contains('reddit')) {
+      return (Icons.forum, Colors.deepOrange);
+    } else if (domain.contains('docs.') || domain.contains('documentation')) {
+      return (Icons.menu_book, Colors.indigo);
+    } else {
+      return (Icons.language, Colors.blue);
+    }
+  }
+
   Widget _buildResultCard(Item item) {
     IconData icon;
     Color color;
 
     switch (item.type) {
       case ItemType.link:
-        icon = Icons.link;
-        color = Colors.blue;
+        // Use domain-based styling for links
+        if (item is LinkItem) {
+          final style = _getLinkStyle(item.url);
+          icon = style.$1;
+          color = style.$2;
+        } else {
+          icon = Icons.link;
+          color = Colors.blue;
+        }
         break;
       case ItemType.document:
         icon = Icons.description;
