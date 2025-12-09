@@ -301,16 +301,26 @@ class StatisticsScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final item = stats.recentItems[index];
               IconData icon;
+              Color iconColor;
+              
               if (item is LinkItem) {
-                icon = Icons.link;
+                // Use domain-based styling for links
+                final style = _getLinkStyle(item.url);
+                icon = style.$1;
+                iconColor = style.$2;
               } else if (item is DocumentItem) {
                 icon = Icons.description;
+                iconColor = Colors.orange;
               } else {
                 icon = Icons.edit_note;
+                iconColor = Colors.purple;
               }
 
               return ListTile(
-                leading: CircleAvatar(child: Icon(icon, size: 20)),
+                leading: CircleAvatar(
+                  backgroundColor: iconColor.withOpacity(0.1),
+                  child: Icon(icon, size: 20, color: iconColor),
+                ),
                 title: Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis),
                 subtitle: Text(
                   _formatDate(item.updatedAt),
@@ -328,6 +338,41 @@ class StatisticsScreen extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  // Helper to extract domain from URL
+  String _getDomain(String url) {
+    try {
+      final uri = Uri.parse(url);
+      return uri.host.replaceAll('www.', '');
+    } catch (e) {
+      return url;
+    }
+  }
+
+  // Helper to get color and icon based on domain (same as search screen)
+  (IconData, Color) _getLinkStyle(String url) {
+    final domain = _getDomain(url).toLowerCase();
+    
+    if (domain.contains('github')) {
+      return (Icons.code, Colors.black);
+    } else if (domain.contains('youtube') || domain.contains('youtu.be')) {
+      return (Icons.play_circle, Colors.red);
+    } else if (domain.contains('twitter') || domain.contains('x.com')) {
+      return (Icons.tag, Colors.blue);
+    } else if (domain.contains('linkedin')) {
+      return (Icons.work, Colors.blue.shade700);
+    } else if (domain.contains('medium') || domain.contains('dev.to')) {
+      return (Icons.article, Colors.green.shade700);
+    } else if (domain.contains('stackoverflow')) {
+      return (Icons.question_answer, Colors.orange);
+    } else if (domain.contains('reddit')) {
+      return (Icons.forum, Colors.deepOrange);
+    } else if (domain.contains('docs.') || domain.contains('documentation')) {
+      return (Icons.menu_book, Colors.indigo);
+    } else {
+      return (Icons.language, Colors.blue);
+    }
   }
 
   String _formatDate(DateTime date) {
