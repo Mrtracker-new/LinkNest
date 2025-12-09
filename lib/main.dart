@@ -157,7 +157,7 @@ class _LinkNestAppState extends ConsumerState<LinkNestApp> {
       // Delay navigation to ensure router is ready
       Future.delayed(const Duration(milliseconds: 100), () {
         if (mounted) {
-          _router.go(route);
+          _router.go(route!);
         }
       });
     }
