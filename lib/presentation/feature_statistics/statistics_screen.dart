@@ -329,7 +329,7 @@ class StatisticsScreen extends ConsumerWidget {
                   ),
                   title: Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis),
                   subtitle: Text(
-                    item.type.name.toUpperCase(),
+                    _getTypeLabel(item.type),
                     style: TextStyle(fontSize: 11, color: iconColor, fontWeight: FontWeight.w500),
                   ),
                   trailing: Row(
@@ -383,6 +383,18 @@ class StatisticsScreen extends ConsumerWidget {
       return (Icons.menu_book, Colors.indigo);
     } else {
       return (Icons.language, Colors.blue);
+    }
+  }
+
+  // Helper to convert ItemType enum to string label
+  String _getTypeLabel(ItemType type) {
+    switch (type) {
+      case ItemType.link:
+        return 'LINK';
+      case ItemType.document:
+        return 'DOCUMENT';
+      case ItemType.note:
+        return 'NOTE';
     }
   }
 
