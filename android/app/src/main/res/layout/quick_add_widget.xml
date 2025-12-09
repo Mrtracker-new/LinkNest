@@ -1,108 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center">
+    android:padding="16dp">
 
-    <!-- Widget Header -->
+    <!-- Widget Title -->
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/widget_title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LinkNest Quick Add"
-        android:textSize="16sp"
+        android:layout_centerHorizontal="true"
+        android:text="Quick Add"
+        android:textSize="12sp"
+        android:textColor="#AAAAAA"
         android:textStyle="bold"
-        android:textColor="#FFFFFF"
-        android:gravity="center"
-        android:paddingBottom="16dp"
-        android:letterSpacing="0.05" />
+        android:letterSpacing="0.1"
+        android:paddingBottom="8dp" />
 
-    <!-- Quick Add Buttons -->
+    <!-- Buttons Container -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/widget_title"
+        android:layout_centerVertical="true"
         android:orientation="horizontal"
         android:gravity="center"
         android:weightSum="3">
 
-        <!-- Add Link Button -->
-        <LinearLayout
+        <!-- Link Button Card -->
+        <FrameLayout
             android:id="@+id/add_link_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="12dp">
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/button_card_green"
+            android:padding="16dp">
             
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_link"
-                android:contentDescription="Add Link" />
-            
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Link"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="#4CAF50"
-                android:paddingTop="8dp" />
-        </LinearLayout>
+                android:orientation="vertical"
+                android:gravity="center">
+                
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_link"
+                    android:contentDescription="Add Link" />
+                
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Link"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:paddingTop="6dp" />
+            </LinearLayout>
+        </FrameLayout>
 
-        <!-- Add Document Button -->
-        <LinearLayout
+        <!-- Document Button Card -->
+        <FrameLayout
             android:id="@+id/add_document_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="12dp">
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="3dp"
+            android:background="@drawable/button_card_orange"
+            android:padding="16dp">
             
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_document"
-                android:contentDescription="Add Document" />
-            
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Doc"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="#FF9800"
-                android:paddingTop="8dp" />
-        </LinearLayout>
+                android:orientation="vertical"
+                android:gravity="center">
+                
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_document"
+                    android:contentDescription="Add Document" />
+                
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Doc"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:paddingTop="6dp" />
+            </LinearLayout>
+        </FrameLayout>
 
-        <!-- Add Note Button -->
-        <LinearLayout
+        <!-- Note Button Card -->
+        <FrameLayout
             android:id="@+id/add_note_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:padding="12dp">
+            android:layout_marginStart="6dp"
+            android:background="@drawable/button_card_purple"
+            android:padding="16dp">
             
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_note"
-                android:contentDescription="Add Note" />
-            
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Note"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="#9C27B0"
-                android:paddingTop="8dp" />
-        </LinearLayout>
+                android:orientation="vertical"
+                android:gravity="center">
+                
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_note"
+                    android:contentDescription="Add Note" />
+                
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Note"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:paddingTop="6dp" />
+            </LinearLayout>
+        </FrameLayout>
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>
