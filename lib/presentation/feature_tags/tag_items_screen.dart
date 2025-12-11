@@ -43,10 +43,9 @@ class TagItemsScreen extends ConsumerWidget {
 
           return RefreshIndicator(
             onRefresh: () async => ref.invalidate(tagItemsProvider(tagId)),
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+            child: ListView.builder(
+              padding: const EdgeInsets.all(8),
               itemCount: items.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 final item = items[index];
                 IconData icon;
@@ -54,7 +53,7 @@ class TagItemsScreen extends ConsumerWidget {
 
                 if (item is LinkItem) {
                   icon = Icons.link;
-                  iconColor = Colors.green;
+                  iconColor = Colors.red;
                 } else if (item is DocumentItem) {
                   icon = Icons.description;
                   iconColor = Colors.orange;
@@ -63,65 +62,72 @@ class TagItemsScreen extends ConsumerWidget {
                   iconColor = Colors.purple;
                 }
 
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: iconColor.withOpacity(0.1),
-                    child: Icon(icon, color: iconColor, size: 20),
-                  ),
-                  title: Text(
-                    item.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.type.name.toUpperCase(),
-                        style: const TextStyle(fontSize: 10),
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: iconColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      if (item.tags.length > 1) ...[
-                        const SizedBox(height: 4),
-                        Wrap(
-                          spacing: 4,
-                          children: item.tags
-                              .where((t) => t.id != tagId)
-                              .take(3)
-                              .map((tag) => Chip(
-                                    label: Text(
-                                      tag.name,
-                                      style: const TextStyle(fontSize: 10),
-                                    ),
-                                    materialTapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    visualDensity: VisualDensity.compact,
-                                    padding: EdgeInsets.zero,
-                                    backgroundColor: tag.color != null
-                                        ? Color(tag.color!).withOpacity(0.2)
-                                        : null,
-                                  ))
-                              .toList(),
+                      child: Icon(icon, color: iconColor, size: 20),
+                    ),
+                    title: Text(
+                      item.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.type.name.toUpperCase(),
+                          style: TextStyle(fontSize: 11, color: iconColor, fontWeight: FontWeight.w500),
+                        ),
+                        if (item.tags.length > 1) ...[
+                          const SizedBox(height: 4),
+                          Wrap(
+                            spacing: 4,
+                            children: item.tags
+                                .where((t) => t.id != tagId)
+                                .take(3)
+                                .map((tag) => Chip(
+                                      label: Text(
+                                        tag.name,
+                                        style: const TextStyle(fontSize: 10),
+                                      ),
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      visualDensity: VisualDensity.compact,
+                                      padding: EdgeInsets.zero,
+                                      backgroundColor: tag.color != null
+                                          ? Color(tag.color!).withOpacity(0.2)
+                                          : null,
+                                    ))
+                                .toList(),
+                          ),
+                        ],
+                      ],
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (item.isFavorite)
+                          const Icon(
+                            Icons.star,
+                            color: Colors.orange,
+                            size: 20,
+                          ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(Icons.share, size: 20),
+                          onPressed: () => AppActions.shareItem(item),
                         ),
                       ],
-                    ],
+                    ),
+                    onTap: () => AppActions.openItem(context, item),
                   ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (item.isFavorite)
-                        const Icon(
-                          Icons.star,
-                          color: Colors.orange,
-                          size: 20,
-                        ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: const Icon(Icons.share, size: 20),
-                        onPressed: () => AppActions.shareItem(item),
-                      ),
-                    ],
-                  ),
-                  onTap: () => AppActions.openItem(context, item),
                 )
                     .animate()
                     .fadeIn(duration: 300.ms, delay: (index * 50).ms)
