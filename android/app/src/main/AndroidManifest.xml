@@ -36,13 +36,13 @@
         </activity>
         
         <!-- Home Screen Widget -->
-        <receiver android:name=".QuickAddWidgetProvider"
+        <receiver android:name=".StatsWidgetProvider"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider"
-                android:resource="@xml/quick_add_widget_info" />
+                android:resource="@xml/stats_widget_info" />
         </receiver>
         
         <!-- Don't delete the meta-data below.
