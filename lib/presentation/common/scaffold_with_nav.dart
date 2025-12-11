@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:linknest/presentation/common/app_actions.dart';
 import 'package:linknest/presentation/feature_links/add_link_dialog.dart';
+import 'package:linknest/presentation/providers/providers.dart';
 
 class ScaffoldWithNavBar extends ConsumerWidget {
   final Widget child;
@@ -48,6 +49,15 @@ class ScaffoldWithNavBar extends ConsumerWidget {
     
     // On Links page - only show Add Link
     if (location.startsWith('/links')) {
+      // Check if we should auto-trigger the dialog from widget
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final pendingAction = ref.read(pendingWidgetActionProvider);
+        if (pendingAction == 'add_link') {
+          ref.read(pendingWidgetActionProvider.notifier).state = null;
+          _showAddLinkDialog(context, ref);
+        }
+      });
+      
       return FloatingActionButton(
         onPressed: () async {
           await HapticFeedback.mediumImpact();
@@ -59,6 +69,15 @@ class ScaffoldWithNavBar extends ConsumerWidget {
     
     // On Docs page - only show Add Document
     if (location.startsWith('/docs')) {
+      // Check if we should auto-trigger the dialog from widget
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final pendingAction = ref.read(pendingWidgetActionProvider);
+        if (pendingAction == 'add_document') {
+          ref.read(pendingWidgetActionProvider.notifier).state = null;
+          _showAddDocDialog(context, ref);
+        }
+      });
+      
       return FloatingActionButton(
         onPressed: () async {
           await HapticFeedback.mediumImpact();
