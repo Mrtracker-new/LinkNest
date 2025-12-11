@@ -74,7 +74,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Your Private Knowledge Vault',
+                  'Save anything, find everything',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onPrimaryContainer.withOpacity(0.7),
                       ),
