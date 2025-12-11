@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:linknest/presentation/providers/providers.dart';
+import 'package:linknest/presentation/widgets/home_widget_data_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -468,6 +469,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       final importResult = await exportService.importFromFile(filePath);
 
       // Refresh all providers
+      ref.invalidate(allItemsProvider); // Widget service listens to this!
       ref.invalidate(linksProvider);
       ref.invalidate(docsProvider);
       ref.invalidate(notesProvider);
@@ -475,6 +477,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ref.invalidate(favoritesProvider);
       ref.invalidate(recentItemsProvider);
       ref.invalidate(statisticsProvider);
+      
+      // Manually update widget after import
+      try {
+        await ref.read(homeWidgetDataServiceProvider).forceUpdate();
+        print('🔄 Widget manually updated after import');
+      } catch (e) {
+        print('⚠️ Failed to update widget after import: $e');
+      }
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
