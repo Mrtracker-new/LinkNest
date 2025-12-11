@@ -42,24 +42,27 @@ class QuickAddWidgetProvider : AppWidgetProvider() {
 
             // Add Link button
             val addLinkIntent = Intent(context, MainActivity::class.java).apply {
-                data = Uri.parse("linknest://add_link")
+                data = Uri.parse("linknest://add_link?action=show_dialog")
                 action = Intent.ACTION_VIEW
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             }
             val addLinkPendingIntent = PendingIntent.getActivity(context, 0, addLinkIntent, flags)
             views.setOnClickPendingIntent(R.id.add_link_button, addLinkPendingIntent)
 
             // Add Document button
             val addDocIntent = Intent(context, MainActivity::class.java).apply {
-                data = Uri.parse("linknest://add_document")
+                data = Uri.parse("linknest://add_document?action=show_dialog")
                 action = Intent.ACTION_VIEW
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             }
             val addDocPendingIntent = PendingIntent.getActivity(context, 1, addDocIntent, flags)
             views.setOnClickPendingIntent(R.id.add_document_button, addDocPendingIntent)
 
             // Add Note button
             val addNoteIntent = Intent(context, MainActivity::class.java).apply {
-                data = Uri.parse("linknest://add_note")
+                data = Uri.parse("linknest://add_note?action=show_dialog")
                 action = Intent.ACTION_VIEW
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             }
             val addNotePendingIntent = PendingIntent.getActivity(context, 2, addNoteIntent, flags)
             views.setOnClickPendingIntent(R.id.add_note_button, addNotePendingIntent)
