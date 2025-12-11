@@ -68,10 +68,10 @@ class HomeScreen extends ConsumerWidget {
                                 ),
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            'Your Knowledge Vault',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
+                        Text(
+                          'Collect what matters',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
                           const SizedBox(height: 4),
                           Text(
                             'Locally stored • Secure • Offline',
