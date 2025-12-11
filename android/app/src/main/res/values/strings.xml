@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">LinkNest</string>
-    <string name="widget_description">Quick shortcuts to add links, documents, or notes</string>
+    <string name="stats_widget_description">View your LinkNest vault statistics at a glance</string>
 </resources>
