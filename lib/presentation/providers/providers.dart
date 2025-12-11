@@ -10,6 +10,9 @@ import 'package:linknest/domain/repositories/item_repository.dart';
 // Theme Mode Provider
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.system);
 
+// Pending Widget Action Provider (for triggering dialogs from widget)
+final pendingWidgetActionProvider = StateProvider<String?>((ref) => null);
+
 // Database Provider
 final databaseProvider = Provider<AppDatabase>((ref) {
   return AppDatabase();
