@@ -18,6 +18,7 @@ import 'package:linknest/presentation/feature_home/favorites_screen.dart';
 import 'package:linknest/presentation/providers/providers.dart';
 import 'package:linknest/presentation/widgets/home_widget_manager.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 
 final _router = GoRouter(
@@ -104,6 +105,38 @@ class _LinkNestAppState extends ConsumerState<LinkNestApp> {
     super.initState();
     _checkForWidgetLaunch();
     _listenForWidgetClicks();
+    _startUriPolling();
+  }
+  
+  // Poll SharedPreferences for widget click URIs
+  void _startUriPolling() {
+    // Check every 500ms for new widget clicks
+    Future.delayed(const Duration(milliseconds: 500), _checkForStoredUri);
+  }
+  
+  Future<void> _checkForStoredUri() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final storedUri = prefs.getString('HomeWidget.clicked_uri');
+      
+      if (storedUri != null && storedUri.isNotEmpty) {
+        debugPrint('Found stored URI: $storedUri');
+        
+        // Clear the stored URI immediately
+        await prefs.remove('HomeWidget.clicked_uri');
+        
+        // Parse and handle the URI
+        final uri = Uri.parse(storedUri);
+        _handleWidgetUri(uri);
+      }
+    } catch (e) {
+      debugPrint('Error checking stored URI: $e');
+    }
+    
+    // Continue polling
+    if (mounted) {
+      Future.delayed(const Duration(milliseconds: 500), _checkForStoredUri);
+    }
   }
 
   @override
@@ -137,9 +170,13 @@ class _LinkNestAppState extends ConsumerState<LinkNestApp> {
   // Handle the widget URI and navigate
   void _handleWidgetUri(Uri uri) {
     final path = uri.host;
+    final action = uri.queryParameters['action'];
     String? route;
     
-    debugPrint('Widget clicked with URI: $uri');
+    debugPrint('=== Widget Deep Link ===');
+    debugPrint('Full URI: $uri');
+    debugPrint('Path: $path');
+    debugPrint('Action: $action');
     
     switch (path) {
       case 'add_link':
@@ -154,9 +191,17 @@ class _LinkNestAppState extends ConsumerState<LinkNestApp> {
     }
     
     if (route != null) {
-      // Delay navigation to ensure router is ready
-      Future.delayed(const Duration(milliseconds: 100), () {
+      // If action is show_dialog, set the pending action
+      if (action == 'show_dialog' && path != 'add_note') {
+        // For notes, navigation to /notes/edit already opens the editor
+        ref.read(pendingWidgetActionProvider.notifier).state = path;
+        debugPrint('Set pending action: $path');
+      }
+      
+      // Longer delay to ensure router is ready, especially on cold start
+      Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
+          debugPrint('Navigating to: $route');
           _router.go(route!);
         }
       });
