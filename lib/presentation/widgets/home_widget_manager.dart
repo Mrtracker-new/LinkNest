@@ -1,64 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
-/// Manages the Quick Add home screen widget
+/// Manages the Statistics home screen widget
 class HomeWidgetManager {
-  static const String _widgetName = 'QuickAddWidget';
+  static const String _widgetName = 'StatsWidget';
   
-  /// Initialize the home widget and set up listeners
-  static Future<void> initialize(BuildContext context) async {
+  /// Initialize the home widget
+  static Future<void> initialize() async {
     // Set initial widget data
-    await updateWidget();
-    
-    // Listen for widget interactions
-    HomeWidget.widgetClicked.listen((Uri? uri) {
-      if (uri != null) {
-        _handleWidgetAction(context, uri);
-      }
-    });
+    await updateWidget(
+      totalItems: 0,
+      linksCount: 0,
+      documentsCount: 0,
+      notesCount: 0,
+    );
   }
   
-  /// Update the widget with latest data
-  static Future<void> updateWidget() async {
+  /// Update the widget with latest statistics
+  static Future<void> updateWidget({
+    required int totalItems,
+    required int linksCount,
+    required int documentsCount,
+    required int notesCount,
+  }) async {
     try {
-      await HomeWidget.saveWidgetData<String>('app_name', 'LinkNest');
+      // Save statistics to SharedPreferences for widget
+      await HomeWidget.saveWidgetData<int>('widget_total_items', totalItems);
+      await HomeWidget.saveWidgetData<int>('widget_links_count', linksCount);
+      await HomeWidget.saveWidgetData<int>('widget_documents_count', documentsCount);
+      await HomeWidget.saveWidgetData<int>('widget_notes_count', notesCount);
+      
+      // Save last updated timestamp
+      final now = DateFormat('HH:mm').format(DateTime.now());
+      await HomeWidget.saveWidgetData<String>('widget_last_updated', now);
+      
+      // Trigger widget update
       await HomeWidget.updateWidget(
         name: _widgetName,
-        androidName: 'QuickAddWidgetProvider',
+        androidName: 'StatsWidgetProvider',
       );
     } catch (e) {
       debugPrint('Error updating widget: $e');
     }
-  }
-  
-  /// Handle actions from widget button taps
-  static void _handleWidgetAction(BuildContext context, Uri uri) {
-    final action = uri.host;
-    
-    switch (action) {
-      case 'add_link':
-        context.push('/links/add');
-        break;
-      case 'add_document':
-        context.push('/docs/add');
-        break;
-      case 'add_note':
-        context.push('/notes/add');
-        break;
-      default:
-        debugPrint('Unknown widget action: $action');
-    }
-  }
-  
-  /// Set up background update callback (if needed in future)
-  static Future<void> registerBackgroundCallback() async {
-    await HomeWidget.registerBackgroundCallback(_backgroundCallback);
-  }
-  
-  @pragma('vm:entry-point')
-  static Future<void> _backgroundCallback(Uri? uri) async {
-    // Background tasks if needed
-    await updateWidget();
   }
 }
